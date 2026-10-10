@@ -1,0 +1,6 @@
+{
+  "name": "Destill — Hybrid Video Companion",
+  "description": "Local-first AI-assisted video understanding and editing companion for creators. Distill long footage into clear shorts.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

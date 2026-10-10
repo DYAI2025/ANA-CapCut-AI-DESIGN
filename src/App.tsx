@@ -1,0 +1,99 @@
+import { useEffect } from "react";
+import { AppProvider, useApp } from "./lib/store";
+import { TopBar } from "./components/TopBar";
+import { FlowTrail } from "./components/FlowTrail";
+import { Sidebar, BottomNav } from "./components/Shell";
+import { Toast } from "./components/Toast";
+import { PrototypePanel } from "./components/PrototypePanel";
+import { IconLock } from "./lib/icons";
+import { cn } from "./utils/cn";
+
+// Screens
+import { Home } from "./screens/Home";
+import { Processing } from "./screens/Processing";
+import { Understanding } from "./screens/Understanding";
+import { Result } from "./screens/Result";
+import { Decision } from "./screens/Decision";
+import { Blocked } from "./screens/Blocked";
+import { Projects } from "./screens/Projects";
+import { Compare } from "./screens/Compare";
+import { Style } from "./screens/Style";
+import { Settings } from "./screens/Settings";
+
+function ScreenRouter() {
+  const { screen } = useApp();
+
+  switch (screen) {
+    case "home":
+      return <Home />;
+    case "processing":
+      return <Processing />;
+    case "understanding":
+      return <Understanding />;
+    case "result":
+      return <Result />;
+    case "decision":
+      return <Decision />;
+    case "blocked":
+      return <Blocked />;
+    case "projects":
+      return <Projects />;
+    case "compare":
+      return <Compare />;
+    case "style":
+      return <Style />;
+    case "settings":
+      return <Settings />;
+    default:
+      return <Home />;
+  }
+}
+
+function MainLayout() {
+  const { lang, calmMotion, t } = useApp();
+
+  useEffect(() => {
+    document.documentElement.lang = lang;
+  }, [lang]);
+
+  return (
+    <div className={cn("relative min-h-[100dvh] flex flex-col text-[#1c2434]", calmMotion && "calm")}>
+      <TopBar />
+      <FlowTrail />
+
+      {/* Main Workspace Frame */}
+      <div className="mx-auto flex w-full max-w-[1440px] flex-1 gap-5 px-3 py-2 lg:gap-7 lg:px-6">
+        <Sidebar />
+        <main className="screen-in min-w-0 flex-1 pb-24 lg:pb-16">
+          <ScreenRouter />
+        </main>
+      </div>
+
+      {/* Subordinate Footer */}
+      <footer className="mx-auto w-full max-w-[1440px] px-6 py-4 text-center text-[12px] font-medium text-[#6b7791]">
+        <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
+          <span className="flex items-center gap-1.5">
+            <IconLock size={13} />
+            {t("localGuarantee")}
+          </span>
+          <span>•</span>
+          <span>Destill v0.2 Hybrid Interactive Prototype</span>
+          <span>•</span>
+          <span>Ana Creator Context</span>
+        </div>
+      </footer>
+
+      <BottomNav />
+      <Toast />
+      <PrototypePanel />
+    </div>
+  );
+}
+
+export default function App() {
+  return (
+    <AppProvider>
+      <MainLayout />
+    </AppProvider>
+  );
+}
