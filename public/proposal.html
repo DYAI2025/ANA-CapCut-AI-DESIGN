@@ -1,0 +1,545 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DESTILL — Visual Design Refinement Proposal (v0.2 → v0.2.1)</title>
+  <style>
+    :root {
+      --bg: #eef1f6;
+      --bg-high: #f8fafc;
+      --surface: #f2f5f9;
+      --surface-low: #e8edf3;
+      --surface-lift: #fbfcfd;
+      --ink: #151922;
+      --ink-muted: #4d5566;
+      --ink-support: #606d81; /* Calibrated contrast token (4.66:1+ against surfaces) */
+      --ink-faint-old: #788296; /* Obsolete under-contrast token (3.49:1) */
+      --accent: #3559cb;
+      --accent-soft: #e6ecff;
+      --success: #0e6f64;
+      --warning: #7d4508;
+      --danger: #a8301f;
+
+      --radius-shell: 32px;
+      --radius-card: 28px;
+      --radius-well: 22px;
+      --radius-control: 18px;
+      --radius-small: 12px;
+      --radius-pill: 999px;
+
+      /* Physically Calibrated Upper-Left Lighting */
+      --shadow-raised:
+        8px 10px 22px rgba(154, 168, 188, 0.28),
+        -8px -8px 20px rgba(255, 255, 255, 0.95),
+        inset 0 1px 0 rgba(255, 255, 255, 0.70);
+
+      --shadow-raised-control:
+        4px 5px 12px rgba(154, 168, 188, 0.26),
+        -4px -4px 11px rgba(255, 255, 255, 0.95),
+        inset 0 1px 0 rgba(255, 255, 255, 0.80);
+
+      --shadow-well-deep:
+        inset 5px 5px 12px rgba(154, 168, 188, 0.38),
+        inset -5px -5px 12px rgba(255, 255, 255, 0.92);
+
+      --shadow-well-track:
+        inset 3px 3px 7px rgba(154, 168, 188, 0.36),
+        inset -3px -3px 7px rgba(255, 255, 255, 0.90);
+
+      --shadow-graphite-cta:
+        0 14px 28px -8px rgba(21, 25, 34, 0.48),
+        6px 8px 18px rgba(154, 168, 188, 0.26),
+        -6px -6px 18px rgba(255, 255, 255, 0.92),
+        inset 0 1px 0 rgba(255, 255, 255, 0.28);
+
+      --shadow-cta-active:
+        inset 0 3px 8px rgba(0, 0, 0, 0.55),
+        inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Plus Jakarta Sans", "Segoe UI", Roboto, sans-serif;
+      background: radial-gradient(1300px 800px at 10% -5%, var(--bg-high) 0%, transparent 68%),
+                  radial-gradient(1100px 750px at 100% 100%, #e2e8f1 0%, transparent 64%),
+                  var(--bg);
+      color: var(--ink);
+      line-height: 1.5;
+      padding: 40px 20px 80px;
+    }
+
+    .container {
+      max-width: 1240px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 36px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid rgba(198, 204, 216, 0.5);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: var(--radius-pill);
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      background: var(--surface-low);
+      color: var(--accent);
+      box-shadow: inset 1px 1px 3px rgba(154, 168, 188, 0.3), inset -1px -1px 3px #fff;
+    }
+
+    h1 {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin: 12px 0 6px;
+    }
+
+    p.lead {
+      font-size: 16px;
+      color: var(--ink-muted);
+      max-width: 720px;
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin: 40px 0 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+
+    /* Sculpted Cards */
+    .card {
+      background: linear-gradient(150deg, #f9fbfd 0%, var(--surface) 100%);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-raised);
+      padding: 24px;
+      position: relative;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink-support);
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Milled Well */
+    .well {
+      background: linear-gradient(145deg, #e3e8ef 0%, #f4f6fa 100%);
+      border-radius: var(--radius-well);
+      box-shadow: var(--shadow-well-deep);
+      padding: 24px;
+      text-align: center;
+    }
+
+    /* Micro-Geometry Zoom Comparison Frame */
+    .zoom-frame {
+      border: 1px dashed rgba(53, 89, 203, 0.4);
+      border-radius: 16px;
+      padding: 16px;
+      background: rgba(255, 255, 255, 0.4);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* Graphite Tactile CTA */
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      height: 58px;
+      padding: 0 36px;
+      border-radius: var(--radius-control);
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: #ffffff;
+      background: linear-gradient(160deg, #2a3140 0%, #151922 60%, #0d1017 100%);
+      box-shadow: var(--shadow-graphite-cta);
+      border: none;
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .cta-btn:active {
+      transform: translateY(1px);
+      box-shadow: var(--shadow-cta-active);
+    }
+
+    /* Segmented Control */
+    .segmented {
+      display: inline-flex;
+      background: linear-gradient(145deg, #e4e9f0 0%, #f3f6fa 100%);
+      box-shadow: var(--shadow-well-track);
+      border-radius: 16px;
+      padding: 4px;
+      gap: 4px;
+      width: 100%;
+    }
+
+    .segmented-thumb {
+      flex: 1;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 12px;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .segmented-thumb.active {
+      background: linear-gradient(150deg, #ffffff 0%, #f0f3f8 100%);
+      color: var(--ink);
+      box-shadow: var(--shadow-raised-control);
+    }
+
+    .segmented-thumb.inactive {
+      color: var(--ink-support);
+    }
+
+    /* Slider Track & Knob */
+    .slider-demo {
+      position: relative;
+      height: 10px;
+      border-radius: var(--radius-pill);
+      background: linear-gradient(145deg, #e3e8ef 0%, #f4f6fa 100%);
+      box-shadow: var(--shadow-well-track);
+      margin: 24px 8px;
+    }
+
+    .slider-fill {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 50%;
+      border-radius: var(--radius-pill);
+      background: linear-gradient(90deg, #8ba2ff 0%, #3559cb 100%);
+    }
+
+    .slider-knob {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: radial-gradient(circle at center, #3559cb 0, #3559cb 3.5px, transparent 4px),
+                  linear-gradient(150deg, #ffffff 0%, #e2e7ef 100%);
+      box-shadow: 3px 4px 10px rgba(154, 168, 188, 0.45), -3px -3px 8px #ffffff;
+      cursor: pointer;
+    }
+
+    /* Contrast Audit Table */
+    table.audit-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+      margin: 16px 0;
+    }
+
+    table.audit-table th, table.audit-table td {
+      padding: 12px 14px;
+      text-align: left;
+      border-bottom: 1px solid rgba(198, 204, 216, 0.4);
+    }
+
+    table.audit-table th {
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ink-support);
+      background: var(--surface-low);
+    }
+
+    .pill-pass {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      background: rgba(14, 111, 100, 0.12);
+      color: var(--success);
+    }
+
+    .pill-fail {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      background: rgba(168, 48, 31, 0.12);
+      color: var(--danger);
+    }
+
+    .comparison-strip {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px;
+      border-radius: 14px;
+      background: var(--surface);
+      margin: 8px 0;
+    }
+
+    .token-chip {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      border: 1px solid rgba(0,0,0,0.1);
+    }
+
+    .code-box {
+      font-family: ui-monospace, Menlo, Consolas, monospace;
+      font-size: 12px;
+      background: #151922;
+      color: #e6edf3;
+      padding: 16px;
+      border-radius: 12px;
+      overflow-x: auto;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <span class="badge">Design Specification & Visual Proposal</span>
+      <h1>DESTILL — Premium Sculpted Light UI Refinement</h1>
+      <p class="lead">
+        Optical calibration, micro-geometric precision, legible contrast tokens, and truthful interaction architecture for the Ana creator editing companion.
+      </p>
+    </header>
+
+    <!-- SECTION 1: Micro-Geometry & Physical Light Invariants -->
+    <h2 class="section-title">1. Micro-Geometry & Physical Lighting Invariants</h2>
+    <div class="grid-4">
+      <!-- Concave Ingestion Well -->
+      <div class="card">
+        <div class="card-title">
+          <span>Concave Well</span>
+          <span style="font-size: 11px; color: var(--accent);">r = 22px</span>
+        </div>
+        <div class="well" style="padding: 28px 12px;">
+          <div style="font-size: 28px; margin-bottom: 8px;">◈</div>
+          <div style="font-size: 14px; font-weight: 700;">Milled Recessed Floor</div>
+          <div style="font-size: 12px; color: var(--ink-support); margin-top: 4px;">Opposing inner shadows</div>
+        </div>
+      </div>
+
+      <!-- Graphite Tactile Primary Control -->
+      <div class="card">
+        <div class="card-title">
+          <span>Graphite Primary CTA</span>
+          <span style="font-size: 11px; color: var(--accent);">r = 18px</span>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 120px;">
+          <button class="cta-btn" type="button">
+            <span>Analyze Video</span>
+            <span style="font-size: 18px;">→</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Recessed Segmented Track & Raised Thumb -->
+      <div class="card">
+        <div class="card-title">
+          <span>Segmented Track & Thumb</span>
+          <span style="font-size: 11px; color: var(--accent);">r = 16/12px</span>
+        </div>
+        <div style="display: flex; flex-direction: column; justify-content: center; height: 120px;">
+          <div class="segmented">
+            <div class="segmented-thumb active">TikTok 9:16</div>
+            <div class="segmented-thumb inactive">Instagram</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Circular Timeline Slider Knob -->
+      <div class="card">
+        <div class="card-title">
+          <span>Circular Slider Knob</span>
+          <span style="font-size: 11px; color: var(--accent);">r = 50% (26px)</span>
+        </div>
+        <div style="display: flex; flex-direction: column; justify-content: center; height: 120px;">
+          <div class="slider-demo">
+            <div class="slider-fill"></div>
+            <div class="slider-knob"></div>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--ink-support); font-family: monospace;">
+            <span>30s</span>
+            <span style="color: var(--accent); font-weight: 700;">~90s Target</span>
+            <span>180s</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 2: Contrast & Legibility Calibration -->
+    <h2 class="section-title">2. Text Legibility & Contrast Calibration (WCAG AA Compliance)</h2>
+    <div class="card" style="margin-bottom: 32px;">
+      <table class="audit-table">
+        <thead>
+          <tr>
+            <th>Token Name</th>
+            <th>Hex Value</th>
+            <th>Surface Context</th>
+            <th>Calculated Ratio</th>
+            <th>WCAG AA Status</th>
+            <th>Outcome / Purpose</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>--ink</strong></td>
+            <td><code>#151922</code></td>
+            <td>On <code>#f2f5f9</code> card surface</td>
+            <td><strong>14.8 : 1</strong></td>
+            <td><span class="pill-pass">PASS (AAA)</span></td>
+            <td>Primary headlines, values, metadata titles.</td>
+          </tr>
+          <tr>
+            <td><strong>--ink-muted</strong></td>
+            <td><code>#4d5566</code></td>
+            <td>On <code>#f2f5f9</code> card surface</td>
+            <td><strong>6.84 : 1</strong></td>
+            <td><span class="pill-pass">PASS (AA)</span></td>
+            <td>Body copy, rationale explanations, descriptions.</td>
+          </tr>
+          <tr>
+            <td><strong>--ink-support (NEW)</strong></td>
+            <td><code>#606d81</code></td>
+            <td>On <code>#f2f5f9</code> card surface</td>
+            <td><strong>4.66 : 1</strong></td>
+            <td><span class="pill-pass">PASS (AA)</span></td>
+            <td>Small labels, timestamps, field hints, secondary tags.</td>
+          </tr>
+          <tr>
+            <td><s>--ink-faint (OLD)</s></td>
+            <td><code>#788296</code></td>
+            <td>On <code>#f2f5f9</code> card surface</td>
+            <td>3.49 : 1</td>
+            <td><span class="pill-fail">FAIL (&lt; 4.5:1)</span></td>
+            <td>Replaced. Caused eye strain on small metadata labels.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="grid-2" style="margin-top: 16px;">
+        <div class="comparison-strip">
+          <div class="token-chip" style="background: #788296;"></div>
+          <div>
+            <div style="font-size: 11px; text-transform: uppercase; color: #788296; font-weight: 700;">Old Token (#788296)</div>
+            <div style="font-size: 13px; color: #788296;">Duration: 18:36 • Resolution: 4K • MOV Container</div>
+          </div>
+        </div>
+        <div class="comparison-strip">
+          <div class="token-chip" style="background: #606d81;"></div>
+          <div>
+            <div style="font-size: 11px; text-transform: uppercase; color: #606d81; font-weight: 700;">Calibrated Token (#606d81)</div>
+            <div style="font-size: 13px; color: #606d81;">Duration: 18:36 • Resolution: 4K • MOV Container</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 3: Microgeometry Corrections Audit -->
+    <h2 class="section-title">3. Microgeometry & Class Correction Audit</h2>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Correcting Outdated `neu-raised-xs` in VideoPreview.tsx</div>
+        <p style="font-size: 13.5px; color: var(--ink-muted); margin-bottom: 12px;">
+          The slider scrubber thumb on line 217 in <code>src/components/VideoPreview.tsx</code> was referencing the legacy token <code>neu-raised-xs</code> with non-concentric circular radii and lacked keyboard accessibility hooks.
+        </p>
+        <div class="code-box">
+// BEFORE (Line 217):
+&lt;span className="neu-raised-xs absolute top-1/2 h-4 w-4 -translate-y-1/2 rounded-full bg-white shadow-[0_2px_6px_rgba(0,0,0,0.5)]" /&gt;
+
+// AFTER:
+&lt;span className="sculpt-thumb-knob absolute top-1/2 h-4.5 w-4.5 -translate-y-1/2 rounded-full" /&gt;</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Concentric Radius Discipline</div>
+        <p style="font-size: 13.5px; color: var(--ink-muted); margin-bottom: 12px;">
+          Nested containers maintain optical geometry: <code>r_inner = r_outer - padding</code>.
+        </p>
+        <div class="code-box">
+Outer Shell: 32px radius (p: 24px)
+  → Card Surface: 28px radius (p: 20px)
+    → Milled Recessed Well: 22px radius (p: 16px)
+      → Interactive Video Media: 18px radius (p: 8px)
+        → Inner Controls / Badges: 12px radius</div>
+      </div>
+    </div>
+
+    <!-- SECTION 4: Interface Truthfulness & Provenance Rules -->
+    <h2 class="section-title">4. Interface Truthfulness & Backend Boundary Discipline</h2>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Prohibition of False Claims</div>
+        <ul style="padding-left: 20px; font-size: 13.5px; color: var(--ink-muted); display: flex; flex-direction: column; gap: 8px;">
+          <li><strong>No Synthetic Attribution to Real Files:</strong> If a user uploads their own file (e.g., <code>clip.mp4</code>), the UI states: <em>"Backend model integration pending. Showing verified synthetic reference analysis."</em></li>
+          <li><strong>Truthful Capability Reporting:</strong> <code>automatedMp4Rendering</code> remains explicitly <code>NOT_IMPLEMENTED</code>.</li>
+          <li><strong>Honest Clipboard Handling:</strong> Never displays "Copied" unless the clipboard promise resolves successfully.</li>
+          <li><strong>No Fake Video Rendering:</strong> Result screen is labeled <em>"Candidate Edit Preview"</em> with honest EditPilot text instructions.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Local-First Network Audit</div>
+        <ul style="padding-left: 20px; font-size: 13.5px; color: var(--ink-muted); display: flex; flex-direction: column; gap: 8px;">
+          <li><strong>Google Fonts Fallback:</strong> Replaced blocking remote font stylesheet with safe local system font stack (<code>-apple-system, BlinkMacSystemFont, "SF Pro Text"</code>) with preconnected optional webfonts.</li>
+          <li><strong>Dev Server Binding:</strong> Development server remains bound to local loopback / specified port without telemetry leaks.</li>
+          <li><strong>Zero API Spend:</strong> Exactly €0.00 billable API expenditure.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

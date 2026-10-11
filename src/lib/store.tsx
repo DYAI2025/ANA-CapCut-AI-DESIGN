@@ -21,7 +21,13 @@ import {
   SYNTHETIC_EDIT_PLAN,
   SYNTHETIC_UNDERSTANDING_REPORT,
 } from "../services/engineAdapter";
-import { fmtBytes, fmtTime, resLabel } from "../utils/formatters";
+import { fmtBytes, fmtTime } from "../utils/formatters";
+import {
+  isSafeMediaUrl,
+  sanitizeFileName,
+  sanitizeTextInput,
+  validateVideoFile,
+} from "../utils/security";
 
 export type Screen =
   | "home"
@@ -270,27 +276,34 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [source]);
 
   const pickFile = useCallback((file: File) => {
-    const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
-    const isVideoType = file.type === "" || file.type.startsWith("video/");
-    if (!SUPPORTED_EXTS.includes(ext) && !isVideoType) {
-      triggerBlock("unsupported", file.name);
+    // Robust file validation (size, MIME type, extension, non-empty)
+    const validation = validateVideoFile(file);
+    if (!validation.valid) {
+      triggerBlock("unsupported", validation.sanitizedName);
       return;
     }
 
     cleanupUrl(source);
-    const url = URL.createObjectURL(file);
+    const rawUrl = URL.createObjectURL(file);
+    if (!isSafeMediaUrl(rawUrl)) {
+      triggerBlock("unsupported", validation.sanitizedName);
+      return;
+    }
 
-    // Initial asset with known properties only; unknown is kept blank or estimated
+    const sanitizedName = validation.sanitizedName;
+    const ext = sanitizedName.split(".").pop()?.toLowerCase() ?? "";
+
+    // Initial asset with sanitized and validated properties
     const newAsset: MediaAsset = {
       id: `local-${Date.now()}`,
-      name: file.name,
-      sizeBytes: file.size,
+      name: sanitizedName,
+      sizeBytes: Math.max(0, file.size),
       formattedSize: fmtBytes(file.size),
       durationSeconds: 0,
       formattedDuration: "Probing...",
       displayAspectRatio: "Unknown",
       codec: ext ? ext.toUpperCase() : "Video",
-      objectUrl: url,
+      objectUrl: rawUrl,
       isSyntheticSample: false,
     };
 
@@ -298,37 +311,73 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setRejectedFileName(null);
     go("home");
 
-    // Real video element probe to acquire accurate duration and resolution
+    // Real video element probe with defensive timeout guard and cleanup
     const probe = document.createElement("video");
     probe.preload = "metadata";
     probe.muted = true;
+
+    let probeFinished = false;
+    const cleanupProbe = () => {
+      probeFinished = true;
+      probe.onloadedmetadata = null;
+      probe.onerror = null;
+      probe.removeAttribute("src");
+      probe.load();
+    };
+
+    // 6-second timeout guard to prevent hung video metadata parsing
+    const timeoutTimer = window.setTimeout(() => {
+      if (!probeFinished) {
+        cleanupProbe();
+        setSource((prev) =>
+          prev && prev.objectUrl === rawUrl
+            ? { ...prev, formattedDuration: "Unknown", displayAspectRatio: "Unknown" }
+            : prev
+        );
+      }
+    }, 6000);
+
     probe.onloadedmetadata = () => {
+      window.clearTimeout(timeoutTimer);
+      if (probeFinished) return;
+
       const d = probe.duration;
       const w = probe.videoWidth;
       const h = probe.videoHeight;
-      const ratio = w && h ? (w > h ? "16:9" : "9:16") : "Unknown";
+      const safeDuration = Number.isFinite(d) && d > 0 && d < 86400 ? Math.round(d) : 0;
+      const safeWidth = Number.isFinite(w) && w > 0 ? Math.round(w) : undefined;
+      const safeHeight = Number.isFinite(h) && h > 0 ? Math.round(h) : undefined;
+      const ratio = safeWidth && safeHeight ? (safeWidth >= safeHeight ? "16:9" : "9:16") : "Unknown";
 
       setSource((prev) => {
-        if (!prev || prev.objectUrl !== url) return prev;
+        if (!prev || prev.objectUrl !== rawUrl) return prev;
         return {
           ...prev,
-          durationSeconds: Number.isFinite(d) ? Math.round(d) : 0,
-          formattedDuration: Number.isFinite(d) ? fmtTime(d) : "Unknown",
-          width: w || undefined,
-          height: h || undefined,
+          durationSeconds: safeDuration,
+          formattedDuration: safeDuration > 0 ? fmtTime(safeDuration) : "Unknown",
+          width: safeWidth,
+          height: safeHeight,
           displayAspectRatio: ratio,
           formattedSize: fmtBytes(file.size),
         };
       });
+
+      cleanupProbe();
     };
+
     probe.onerror = () => {
-      setSource((prev) =>
-        prev && prev.objectUrl === url
-          ? { ...prev, formattedDuration: "Unknown", displayAspectRatio: "Unknown" }
-          : prev
-      );
+      window.clearTimeout(timeoutTimer);
+      if (!probeFinished) {
+        setSource((prev) =>
+          prev && prev.objectUrl === rawUrl
+            ? { ...prev, formattedDuration: "Unknown", displayAspectRatio: "Unknown" }
+            : prev
+        );
+        cleanupProbe();
+      }
     };
-    probe.src = url;
+
+    probe.src = rawUrl;
   }, [source, go, triggerBlock]);
 
   const loadSample = useCallback(() => {
@@ -481,11 +530,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
     removeSource,
     openPicker,
     goal,
-    setGoal,
+    setGoal: (v: string) => setGoal(sanitizeTextInput(v, 80)),
     platform,
-    setPlatform,
+    setPlatform: (p: PlatformTarget) => setPlatform(p === "instagram" ? "instagram" : "tiktok"),
     targetDuration,
-    setTargetDuration,
+    setTargetDuration: (n: number) =>
+      setTargetDuration(Math.max(15, Math.min(180, Math.round(Number(n) || 90)))),
     procStage,
     procProgress,
     startAnalysis,
@@ -505,10 +555,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setKeptCut: (b) => {
       setKeptCut(b);
       if (b && source) {
+        const cleanBase = sanitizeFileName(source.name).replace(/\.[^/.]+$/, "");
         setSavedProjects((prev) => [
           {
             id: `proj-${Date.now()}`,
-            name: `${source.name.replace(/\.[^/.]+$/, "")}_destill.mp4`,
+            name: `${cleanBase}_destill.mp4`,
             duration: fmtTime(targetDuration),
             meta: `${platform.toUpperCase()} • 9:16`,
             isKept: true,

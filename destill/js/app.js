@@ -76,13 +76,15 @@
   }
 
   /**
-   * Safely sets HTML content by clearing children and appending parsed, sanitized DOM nodes.
+   * Sanitizes filenames to eliminate traversal, control characters, and injection.
    */
-  function setSafeHtml(container, sanitizedHtmlString) {
-    if (!container) return;
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(sanitizedHtmlString, 'text/html');
-    container.replaceChildren(...doc.body.childNodes);
+  function sanitizeFileName(raw) {
+    if (!raw || typeof raw !== 'string') return 'video_clip.mp4';
+    let clean = raw.replace(/[\x00-\x1F\x7F]/g, '');
+    clean = clean.replace(/^.*[\\/]/, '');
+    clean = clean.replace(/[<>"'`$|;&\\:]/g, '_');
+    clean = clean.replace(/\.{2,}/g, '.').trim();
+    return clean.slice(0, 120) || 'video_clip.mp4';
   }
 
   /* ==========================================================================
@@ -148,22 +150,32 @@
   }
 
   function handleFileSelect(file) {
-    if (!file) return;
+    if (!file || !(file instanceof File)) return;
 
-    const ext = (file.name.split('.').pop() || '').toLowerCase();
+    const safeName = sanitizeFileName(file.name);
+    const ext = (safeName.split('.').pop() || '').toLowerCase();
     const allowed = ['mov', 'mp4', 'm4v', 'webm'];
     if (!allowed.includes(ext) && !file.type.startsWith('video/')) {
       state.blockKind = 'unsupported';
-      state.rejectedName = file.name;
+      state.rejectedName = safeName;
+      navigate('blocked');
+      return;
+    }
+
+    if (file.size <= 0 || file.size > 10 * 1024 * 1024 * 1024) {
+      state.blockKind = 'unsupported';
+      state.rejectedName = safeName;
       navigate('blocked');
       return;
     }
 
     revokeCurrentSource();
-    const url = URL.createObjectURL(file);
+    const rawUrl = URL.createObjectURL(file);
+    const url = sanitizeUrl(rawUrl);
+    if (!url) return;
 
     state.source = {
-      name: file.name,
+      name: safeName,
       size: formatBytes(file.size),
       duration: 'Wird ermittelt...',
       seconds: 0,
@@ -173,19 +185,49 @@
 
     navigate('home');
 
-    // Probe duration safely
+    // Probe duration safely with 6-second timeout
     const probe = document.createElement('video');
     probe.preload = 'metadata';
     probe.muted = true;
+
+    let probeDone = false;
+    const probeTimer = setTimeout(function () {
+      if (!probeDone) {
+        probeDone = true;
+        probe.onloadedmetadata = null;
+        probe.onerror = null;
+        probe.removeAttribute('src');
+        probe.load();
+      }
+    }, 6000);
+
     probe.onloadedmetadata = function () {
+      if (probeDone) return;
+      probeDone = true;
+      clearTimeout(probeTimer);
       if (state.source && state.source.url === url) {
         const sec = Math.round(probe.duration || 0);
-        state.source.seconds = sec;
-        state.source.duration = formatTime(sec);
+        state.source.seconds = Number.isFinite(sec) && sec > 0 ? sec : 0;
+        state.source.duration = state.source.seconds > 0 ? formatTime(state.source.seconds) : 'Unbekannt';
         state.source.resolution = probe.videoHeight >= 2000 ? '4K' : probe.videoHeight >= 1000 ? '1080p' : 'HD';
         render();
       }
+      probe.removeAttribute('src');
+      probe.load();
     };
+
+    probe.onerror = function () {
+      if (probeDone) return;
+      probeDone = true;
+      clearTimeout(probeTimer);
+      if (state.source && state.source.url === url) {
+        state.source.duration = 'Unbekannt';
+        render();
+      }
+      probe.removeAttribute('src');
+      probe.load();
+    };
+
     probe.src = url;
   }
 

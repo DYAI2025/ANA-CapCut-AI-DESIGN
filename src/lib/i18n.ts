@@ -17,7 +17,7 @@ const en = {
   brandKicker: "Video Understanding & Editing Companion",
   localGuarantee: "On this Mac",
   localGuaranteeTooltip: "Your original video stays local. Selected passages or frames are processed only with permission.",
-  staysLocal: "Processed locally, never uploaded",
+  staysLocal: "Read locally, never uploaded",
   navHome: "Home",
   navUnderstanding: "Understanding",
   navResult: "Result Preview",
@@ -529,7 +529,7 @@ const de: Record<DictKey, string> = {
   brandKicker: "Lokaler Begleiter für Video-Verständnis & Schnitt",
   localGuarantee: "Auf diesem Mac",
   localGuaranteeTooltip: "Dein Originalvideo bleibt lokal. Nur ausgewählte Passagen oder Frames werden mit Zustimmung verarbeitet.",
-  staysLocal: "Lokal verarbeitet, nie hochgeladen",
+  staysLocal: "Lokal gelesen, nie hochgeladen",
   navHome: "Start",
   navUnderstanding: "Verständnis",
   navResult: "Schnitt-Vorschau",
@@ -772,15 +772,12 @@ const de: Record<DictKey, string> = {
   closeBtn: "Schließen",
 };
 
+import { safeFormatTemplate } from "../utils/security";
+
 export const DICTIONARIES: Record<Lang, Record<DictKey, string>> = { en, it, de };
 
 export function translate(lang: Lang, key: DictKey, vars?: Record<string, string | number>): string {
   const dict = DICTIONARIES[lang] || en;
-  let text = dict[key] || en[key] || String(key);
-  if (vars) {
-    for (const [k, v] of Object.entries(vars)) {
-      text = text.replace(new RegExp(`\\{${k}\\}`, "g"), String(v));
-    }
-  }
-  return text;
+  const text = dict[key] || en[key] || String(key);
+  return safeFormatTemplate(text, vars);
 }

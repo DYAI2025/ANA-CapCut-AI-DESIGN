@@ -1,11 +1,12 @@
-import { useEffect } from "react";
+import { Component, useEffect, type ErrorInfo, type ReactNode } from "react";
 import { AppProvider, useApp } from "./lib/store";
 import { TopBar } from "./components/TopBar";
 import { FlowTrail } from "./components/FlowTrail";
 import { Sidebar, BottomNav } from "./components/Shell";
 import { Toast } from "./components/Toast";
 import { PrototypePanel } from "./components/PrototypePanel";
-import { IconLock } from "./lib/icons";
+import { IconAlert, IconLock, IconRefresh } from "./lib/icons";
+import { Button, Card, Pill } from "./components/ui";
 import { cn } from "./utils/cn";
 
 // Screens
@@ -19,6 +20,75 @@ import { Projects } from "./screens/Projects";
 import { Compare } from "./screens/Compare";
 import { Style } from "./screens/Style";
 import { Settings } from "./screens/Settings";
+
+interface ErrorBoundaryProps {
+  children: ReactNode;
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+  errorMessage: string;
+}
+
+/**
+ * Defensive Error Boundary to prevent crashes and sanitize error displays
+ */
+class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false, errorMessage: "" };
+  }
+
+  static getDerivedStateFromError(error: unknown): ErrorBoundaryState {
+    const msg = error instanceof Error ? error.message : "An unexpected application error occurred.";
+    return { hasError: true, errorMessage: msg };
+  }
+
+  componentDidCatch(error: unknown, info: ErrorInfo) {
+    // Defensive logging without leaking sensitive properties
+    if (typeof console !== "undefined" && console.error) {
+      console.error("Destill captured isolated component error:", error, info.componentStack);
+    }
+  }
+
+  handleReset = () => {
+    this.setState({ hasError: false, errorMessage: "" });
+    if (typeof window !== "undefined") {
+      window.location.hash = "";
+    }
+  };
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="flex min-h-[100dvh] items-center justify-center p-6 bg-[#edf0f5] text-[#1c2434]">
+          <Card className="flex max-w-[500px] flex-col items-center p-8 text-center">
+            <span className="grid h-16 w-16 place-items-center rounded-2xl bg-[#cc3d61]/15 text-[#cc3d61] mb-4">
+              <IconAlert size={32} />
+            </span>
+            <Pill tone="rose" dot>Session Recovered</Pill>
+            <h2 className="mt-4 text-[22px] font-bold tracking-tight">Something unexpected occurred</h2>
+            <p className="mt-2 text-[14px] text-[#4a566d]">
+              The prototype safely caught an error. Your local files remain untouched.
+            </p>
+            <div className="mt-6 flex gap-3">
+              <Button
+                variant="primary"
+                size="md"
+                icon={<IconRefresh size={15} />}
+                onClick={this.handleReset}
+              >
+                Reset Prototype
+              </Button>
+            </div>
+          </Card>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
 
 function ScreenRouter() {
   const { screen } = useApp();
@@ -53,11 +123,13 @@ function MainLayout() {
   const { lang, calmMotion, t } = useApp();
 
   useEffect(() => {
-    document.documentElement.lang = lang;
+    if (typeof document !== "undefined") {
+      document.documentElement.lang = lang;
+    }
   }, [lang]);
 
   return (
-    <div className={cn("relative min-h-[100dvh] flex flex-col text-[#151922]", calmMotion && "calm")}>
+    <div className={cn("relative min-h-[100dvh] flex flex-col text-[#1c2434]", calmMotion && "calm")}>
       <TopBar />
       <FlowTrail />
 
@@ -92,8 +164,10 @@ function MainLayout() {
 
 export default function App() {
   return (
-    <AppProvider>
-      <MainLayout />
-    </AppProvider>
+    <ErrorBoundary>
+      <AppProvider>
+        <MainLayout />
+      </AppProvider>
+    </ErrorBoundary>
   );
 }

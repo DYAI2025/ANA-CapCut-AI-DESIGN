@@ -4,6 +4,7 @@ import { IconPause, IconPlay } from "../lib/icons";
 import type { MediaAsset } from "../types/contracts";
 import { Scene, type SceneKind } from "./Scene";
 import { fmtTime } from "../utils/formatters";
+import { isSafeMediaUrl } from "../utils/security";
 
 export interface EvidenceMarker {
   id: string;
@@ -40,21 +41,24 @@ export function VideoPreview({
   const [videoError, setVideoError] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  const duration = asset?.durationSeconds && asset.durationSeconds > 0 ? asset.durationSeconds : 1116;
+  const rawDuration = asset?.durationSeconds && asset.durationSeconds > 0 ? asset.durationSeconds : 1116;
+  const duration = Number.isFinite(rawDuration) && rawDuration > 0 ? rawDuration : 1116;
 
   // Sync external time overrides (e.g. clicking evidence markers)
   useEffect(() => {
-    if (currentTimeOverride !== undefined) {
-      setCurrentTime(currentTimeOverride);
+    if (currentTimeOverride !== undefined && Number.isFinite(currentTimeOverride)) {
+      const safeTime = Math.max(0, Math.min(duration, currentTimeOverride));
+      setCurrentTime(safeTime);
       if (videoRef.current) {
-        videoRef.current.currentTime = currentTimeOverride;
+        videoRef.current.currentTime = safeTime;
       }
     }
-  }, [currentTimeOverride]);
+  }, [currentTimeOverride, duration]);
 
   // Simulated timer for generative scenes when real video isn't playing
   useEffect(() => {
-    if (!playing || (asset?.objectUrl && !videoError)) return;
+    const hasRealSafeUrl = asset?.objectUrl && isSafeMediaUrl(asset.objectUrl);
+    if (!playing || (hasRealSafeUrl && !videoError)) return;
     const interval = window.setInterval(() => {
       setCurrentTime((t) => {
         const next = t + 0.5 >= duration ? 0 : t + 0.5;
@@ -66,7 +70,8 @@ export function VideoPreview({
   }, [playing, asset?.objectUrl, videoError, duration, onTimeChange]);
 
   const togglePlay = () => {
-    if (videoRef.current && asset?.objectUrl && !videoError) {
+    const hasRealSafeUrl = asset?.objectUrl && isSafeMediaUrl(asset.objectUrl);
+    if (videoRef.current && hasRealSafeUrl && !videoError) {
       if (playing) {
         videoRef.current.pause();
         setPlaying(false);
@@ -89,7 +94,8 @@ export function VideoPreview({
 
   const handleSeek = (clientX: number, target: HTMLDivElement) => {
     const rect = target.getBoundingClientRect();
-    const ratioPos = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    const width = Math.max(1, rect.width);
+    const ratioPos = Math.max(0, Math.min(1, (clientX - rect.left) / width));
     const newTime = Math.round(ratioPos * duration);
     setCurrentTime(newTime);
     if (videoRef.current && !videoError) {
@@ -97,6 +103,8 @@ export function VideoPreview({
     }
     onTimeChange?.(newTime);
   };
+
+  const hasSafeVideoUrl = !!(asset?.objectUrl && isSafeMediaUrl(asset.objectUrl));
 
   return (
     <div
@@ -107,10 +115,10 @@ export function VideoPreview({
       )}
     >
       {/* Real Video Element if available, otherwise vector generative scene */}
-      {asset?.objectUrl && !videoError ? (
+      {hasSafeVideoUrl && !videoError ? (
         <video
           ref={videoRef}
-          src={asset.objectUrl}
+          src={asset?.objectUrl}
           playsInline
           muted
           className="absolute inset-0 h-full w-full object-cover"
