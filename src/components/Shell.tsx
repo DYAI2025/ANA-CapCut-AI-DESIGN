@@ -45,9 +45,9 @@ export function Sidebar() {
   return (
     <aside
       aria-label="Destill Application Navigation"
-      className="neu-raised sticky top-20 hidden h-[calc(100vh-6rem)] w-[88px] shrink-0 flex-col items-center justify-between rounded-[32px] py-5 lg:flex"
+      className="sculpt-card sticky top-20 hidden h-[calc(100vh-6rem)] w-[84px] shrink-0 flex-col items-center justify-between py-4.5 lg:flex"
     >
-      <nav className="flex flex-col items-center gap-2">
+      <nav className="flex flex-col items-center gap-1.5">
         {NAV_ITEMS.map((item) => {
           const active = screen === item.id;
           const IconComponent = item.icon;
@@ -61,14 +61,14 @@ export function Sidebar() {
                 aria-current={active ? "page" : undefined}
                 aria-label={label}
                 className={cn(
-                  "neu-btn flex h-14 w-14 flex-col items-center justify-center gap-1 rounded-[18px] text-[10.5px] font-semibold transition-all duration-200",
+                  "flex h-13 w-13 flex-col items-center justify-center gap-1 rounded-[16px] text-[10px] font-semibold transition-all duration-150 select-none",
                   active
-                    ? "is-pressed text-[#5160e8]"
-                    : "text-[#6b7791] hover:text-[#1c2434] neu-flat"
+                    ? "sculpt-well text-[#3559cb]"
+                    : "text-[#788296] hover:text-[#151922] sculpt-flat"
                 )}
               >
-                <IconComponent size={20} />
-                <span className="truncate max-w-[56px] scale-90">{label}</span>
+                <IconComponent size={19} />
+                <span className="truncate max-w-[50px] scale-90">{label}</span>
               </button>
             </Tooltip>
           );
@@ -77,8 +77,8 @@ export function Sidebar() {
 
       {/* Ana Creator Avatar */}
       <div className="flex flex-col items-center gap-2 pt-2">
-        <Tooltip label="Creator Profile: Ana (CapCut Active)" side="right">
-          <div className="neu-inset-sm grid h-10 w-10 place-items-center rounded-full text-[13px] font-bold text-[#4a566d]">
+        <Tooltip label="Creator Context: Ana (iPhone CapCut Workflow)" side="right">
+          <div className="sculpt-well-sm grid h-9.5 w-9.5 place-items-center rounded-full text-[12.5px] font-bold text-[#4d5566]">
             A
           </div>
         </Tooltip>
@@ -99,7 +99,6 @@ export function BottomNav() {
     go(item.id);
   };
 
-  // Keep mobile tab bar concise with primary 5 tabs
   const mobileTabs = NAV_ITEMS.filter((item) =>
     ["home", "understanding", "result", "projects", "settings"].includes(item.id)
   );
@@ -107,7 +106,7 @@ export function BottomNav() {
   return (
     <nav
       aria-label="Mobile Navigation"
-      className="neu-raised fixed inset-x-3 bottom-3 z-40 flex items-center justify-around rounded-[26px] p-1.5 shadow-[0_12px_32px_rgba(30,40,70,0.3)] backdrop-blur-lg lg:hidden"
+      className="sculpt-card fixed inset-x-3 bottom-3 z-40 flex items-center justify-around p-1.5 shadow-[0_12px_32px_rgba(21,25,34,0.22)] backdrop-blur-lg lg:hidden"
     >
       {mobileTabs.map((item) => {
         const active = screen === item.id;
@@ -122,11 +121,11 @@ export function BottomNav() {
             aria-current={active ? "page" : undefined}
             aria-label={label}
             className={cn(
-              "neu-btn flex h-13 flex-1 flex-col items-center justify-center gap-1 rounded-[18px] text-[10px] font-bold transition-all duration-200",
-              active ? "is-pressed text-[#5160e8]" : "text-[#6b7791]"
+              "flex h-12 flex-1 flex-col items-center justify-center gap-0.5 rounded-[14px] text-[9.5px] font-bold transition-all duration-150 select-none",
+              active ? "sculpt-well text-[#3559cb]" : "text-[#788296]"
             )}
           >
-            <IconComponent size={19} />
+            <IconComponent size={18} />
             <span className="truncate">{label}</span>
           </button>
         );

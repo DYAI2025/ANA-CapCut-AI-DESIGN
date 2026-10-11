@@ -57,7 +57,7 @@ function MainLayout() {
   }, [lang]);
 
   return (
-    <div className={cn("relative min-h-[100dvh] flex flex-col text-[#1c2434]", calmMotion && "calm")}>
+    <div className={cn("relative min-h-[100dvh] flex flex-col text-[#151922]", calmMotion && "calm")}>
       <TopBar />
       <FlowTrail />
 

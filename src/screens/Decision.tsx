@@ -40,7 +40,6 @@ export function Decision() {
 
   const [localSelection, setLocalSelection] = useState<DecisionOption>(decisionChoice);
 
-  // Compute calculated duration change preview
   const calculatedDuration =
     localSelection === "longer"
       ? Math.min(120, targetDuration + 15)
@@ -59,9 +58,9 @@ export function Decision() {
   ];
 
   return (
-    <div className="mx-auto w-full max-w-[1080px] px-4 pb-24 pt-2 lg:px-6">
+    <div className="mx-auto w-full max-w-[1080px] px-4 pb-24 pt-1 lg:px-6">
       <ScreenHead
-        kicker={t("decKicker")}
+        kicker="S5 — NEEDS_EDITOR_DECISION"
         tone="amber"
         icon={<IconScissors size={13} />}
         title={t("decTitle")}
@@ -70,7 +69,7 @@ export function Decision() {
           <Button
             variant="ghost"
             size="md"
-            icon={<IconArrowLeft size={15} />}
+            icon={<IconArrowLeft size={14} />}
             onClick={() => go("result")}
           >
             {t("decBackBtn")}
@@ -78,36 +77,36 @@ export function Decision() {
         }
       />
 
-      <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:gap-8 items-start">
+      <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:gap-7 items-start">
         {/* Left: Competing Candidate Moments */}
-        <Card className="flex flex-col gap-4 p-5 sm:p-6">
-          <div className="text-[12px] font-bold uppercase tracking-wider text-[#6b7791] text-center">
+        <Card className="flex flex-col gap-3.5 p-5">
+          <div className="text-[11px] font-bold uppercase tracking-wider text-[#788296] text-center">
             Competing Candidate Moments
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-3.5">
             {moments.map((m) => (
-              <figure key={m.tag} className="flex flex-col gap-2">
-                <div className="neu-inset rounded-[24px] p-2">
-                  <div className="relative aspect-[4/5] overflow-hidden rounded-[16px] shadow-[0_6px_16px_rgba(30,40,70,0.2)]">
+              <figure key={m.tag} className="flex flex-col gap-1.5">
+                <div className="sculpt-well p-1.5 rounded-[18px]">
+                  <div className="relative aspect-[4/5] overflow-hidden rounded-[14px]">
                     <Scene kind={m.kind} aspect="9/16" />
-                    <span className="absolute left-2.5 top-2.5 grid h-7 w-7 place-items-center rounded-full bg-white/85 text-[12px] font-bold text-[#1c2434] backdrop-blur-md">
+                    <span className="absolute left-2 top-2 grid h-6 w-6 place-items-center rounded-full bg-white/90 text-[11px] font-bold text-[#151922] backdrop-blur-md">
                       {m.tag}
                     </span>
                   </div>
                 </div>
-                <figcaption className="text-center text-[13px] font-semibold text-[#4a566d]">
+                <figcaption className="text-center text-[12px] font-semibold text-[#4d5566]">
                   {m.label}
                 </figcaption>
               </figure>
             ))}
           </div>
-          <div className="rounded-[16px] bg-black/5 p-3 text-center text-[12px] text-[#6b7791]">
-            Both takes support the story goal. Choosing an option below dictates narrative emphasis.
+          <div className="sculpt-well-sm p-3 text-center text-[11.5px] leading-relaxed text-[#788296]">
+            Selecting an option refines duration rather than blindly chopping important context.
           </div>
         </Card>
 
         {/* Right: Decision Options Selection */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-3.5">
           {OPTIONS.map((o) => {
             const Icon = o.icon;
             const isSelected = localSelection === o.id;
@@ -115,7 +114,7 @@ export function Decision() {
             return (
               <OptionTile
                 key={o.id}
-                icon={<Icon size={22} />}
+                icon={<Icon size={20} />}
                 label={t(o.labelKey)}
                 desc={t(o.descKey)}
                 selected={isSelected}
@@ -128,8 +127,8 @@ export function Decision() {
       </div>
 
       {/* Confirmation Step (Deliberate 2-step flow) */}
-      <div className="mt-9 flex flex-col items-center gap-3 text-center">
-        <div className="flex items-center gap-2 text-[14.5px] font-medium text-[#4a566d]">
+      <div className="mt-8 flex flex-col items-center gap-2.5 text-center">
+        <div className="flex items-center gap-2 text-[13.5px] font-medium text-[#4d5566]">
           <span>
             {t("decNewDurationHint", { len: fmtTime(calculatedDuration) })}
           </span>
@@ -138,11 +137,11 @@ export function Decision() {
           </Pill>
         </div>
 
-        <div className="mt-2">
+        <div className="mt-1">
           <Button
             variant="primary"
             size="xl"
-            icon={<IconScissors size={20} />}
+            icon={<IconScissors size={18} />}
             onClick={handleConfirm}
           >
             {t("decConfirmBtn")}
@@ -152,7 +151,7 @@ export function Decision() {
         <button
           type="button"
           onClick={() => go("result")}
-          className="mt-2 text-[13px] font-semibold text-[#6b7791] hover:text-[#1c2434]"
+          className="mt-1 text-[12px] font-semibold text-[#788296] hover:text-[#151922]"
         >
           {t("decBackBtn")}
         </button>

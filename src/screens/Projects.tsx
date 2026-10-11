@@ -16,11 +16,10 @@ interface ProjectItem {
   meta: string;
   sceneKind: SceneKind;
   isKept: boolean;
-  isAnalyzedOnly?: boolean;
 }
 
 export function Projects() {
-  const { t, go, savedProjects, source, loadSample } = useApp();
+  const { t, go, source, loadSample } = useApp();
 
   const demoItems: ProjectItem[] = [
     {
@@ -30,7 +29,6 @@ export function Projects() {
       meta: "TikTok • 4K ProRes",
       sceneKind: "dawn",
       isKept: true,
-      isAnalyzedOnly: false,
     },
     {
       id: "demo-market",
@@ -39,7 +37,6 @@ export function Projects() {
       meta: "Instagram • 1080p",
       sceneKind: "market",
       isKept: true,
-      isAnalyzedOnly: false,
     },
     {
       id: "demo-coast",
@@ -48,7 +45,6 @@ export function Projects() {
       meta: "TikTok • 4K",
       sceneKind: "coast",
       isKept: false,
-      isAnalyzedOnly: true,
     },
     {
       id: "demo-forest",
@@ -57,12 +53,11 @@ export function Projects() {
       meta: "TikTok • 1080p",
       sceneKind: "forest",
       isKept: true,
-      isAnalyzedOnly: false,
     },
   ];
 
   return (
-    <div className="mx-auto w-full max-w-[1200px] px-4 pb-24 pt-2 lg:px-6">
+    <div className="mx-auto w-full max-w-[1200px] px-4 pb-24 pt-1 lg:px-6">
       <ScreenHead
         kicker={t("projTitle")}
         tone="accent"
@@ -73,7 +68,7 @@ export function Projects() {
           <Button
             variant="primary"
             size="md"
-            icon={<IconPlus size={15} />}
+            icon={<IconPlus size={14} />}
             onClick={() => go("home")}
           >
             {t("projNewBtn")}
@@ -81,12 +76,11 @@ export function Projects() {
         }
       />
 
-      {/* Grid of Projects */}
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {demoItems.map((p) => (
-          <Card key={p.id} hover className="flex flex-col gap-3.5 p-4.5">
-            <div className="neu-inset overflow-hidden rounded-[22px] p-2">
-              <div className="aspect-[16/10] overflow-hidden rounded-[16px]">
+          <Card key={p.id} hover className="flex flex-col gap-3 p-4">
+            <div className="sculpt-well overflow-hidden p-1.5 rounded-[18px]">
+              <div className="aspect-[16/10] overflow-hidden rounded-[14px]">
                 <Scene kind={p.sceneKind} aspect="16/9" />
               </div>
             </div>
@@ -94,10 +88,10 @@ export function Projects() {
             <div className="px-1">
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
-                  <div className="truncate text-[15px] font-bold text-[#1c2434] tracking-tight">
+                  <div className="truncate text-[14.5px] font-bold text-[#151922] tracking-tight">
                     {p.name}
                   </div>
-                  <div className="mt-0.5 text-[12px] text-[#6b7791]">
+                  <div className="mt-0.5 text-[11.5px] text-[#788296] font-mono">
                     {p.meta} • {p.duration}
                   </div>
                 </div>
@@ -107,7 +101,7 @@ export function Projects() {
                 </Pill>
               </div>
 
-              <div className="mt-4 flex items-center gap-2">
+              <div className="mt-3.5 flex items-center gap-2">
                 <Button
                   size="sm"
                   className="flex-1"
@@ -125,27 +119,27 @@ export function Projects() {
                   tip="Compare candidate cut variations"
                   onClick={() => go("compare")}
                 >
-                  <IconCompare size={14} />
+                  <IconCompare size={13} />
                 </Button>
               </div>
             </div>
           </Card>
         ))}
 
-        {/* Add New Source Tile */}
+        {/* Add Source Well Card */}
         <button
           type="button"
           onClick={() => go("home")}
-          className="neu-btn neu-inset flex min-h-[220px] flex-col items-center justify-center gap-3 rounded-[32px] p-6 text-center text-[#6b7791] hover:text-[#5160e8]"
+          className="sculpt-well flex min-h-[200px] flex-col items-center justify-center gap-2.5 p-5 text-center text-[#788296] hover:text-[#3559cb] transition-colors"
         >
-          <span className="neu-raised grid h-14 w-14 place-items-center rounded-[22px]">
-            <IconPlus size={24} />
+          <span className="sculpt-btn-raised grid h-12 w-12 place-items-center rounded-full text-[#3559cb]">
+            <IconPlus size={22} />
           </span>
           <div>
-            <span className="block text-[14.5px] font-bold text-[#1c2434]">
+            <span className="block text-[14px] font-bold text-[#151922]">
               {t("projNewBtn")}
             </span>
-            <span className="text-[12px] text-[#6b7791]">Drop raw footage to begin</span>
+            <span className="text-[11.5px] text-[#788296]">Drop raw footage to begin</span>
           </div>
         </button>
       </div>

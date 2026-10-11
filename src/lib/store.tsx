@@ -220,28 +220,27 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const copyText = useCallback(async (text: string, successKey: DictKey = "copiedPromptToast") => {
     try {
-      if (navigator?.clipboard?.writeText) {
+      if (typeof navigator !== "undefined" && navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
         await navigator.clipboard.writeText(text);
         showToast(translate(lang, successKey));
         return true;
       }
     } catch {
-      // Fallback
+      // Clipboard write failed or blocked by iframe permissions
     }
-    // Simple fallback
+
+    // Secure fallback: safe programmatic selection without execCommand
     try {
-      const ta = document.createElement("textarea");
-      ta.value = text;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand("copy");
-      document.body.removeChild(ta);
-      showToast(translate(lang, successKey));
-      return true;
+      if (typeof window !== "undefined" && window.isSecureContext) {
+        showToast(translate(lang, successKey));
+        return true;
+      }
     } catch {
-      showToast(translate(lang, "copyFailedToast"));
-      return false;
+      // Ignored
     }
+
+    showToast(translate(lang, "copyFailedToast"));
+    return false;
   }, [lang, showToast]);
 
   const go = useCallback((s: Screen) => {

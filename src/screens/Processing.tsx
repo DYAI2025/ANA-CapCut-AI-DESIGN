@@ -29,47 +29,47 @@ export function Processing() {
   );
 
   return (
-    <div className="mx-auto flex min-h-[calc(100vh-210px)] w-full max-w-[800px] items-center px-4 py-6">
-      <Card className="relative w-full overflow-hidden px-5 py-9 text-center sm:px-12 sm:py-12">
-        {/* Source Chip & Demo Mode Tag */}
-        <div className="mb-8 flex flex-wrap items-center justify-center gap-2.5">
+    <div className="mx-auto flex min-h-[calc(100vh-210px)] w-full max-w-[760px] items-center px-4 py-4">
+      <Card className="relative w-full overflow-hidden px-5 py-8 text-center sm:px-10 sm:py-10">
+        {/* State Tag & Source File Context */}
+        <div className="mb-7 flex flex-wrap items-center justify-center gap-2">
           <Pill tone="accent" dot>
             {t("engineDemoBadge")}
           </Pill>
-          <span className="neu-inset-sm inline-flex h-7.5 items-center gap-2 rounded-full px-3 text-[12px] font-semibold text-[#1c2434]">
-            <span className="truncate max-w-[180px]">{source?.name ?? "Source Video"}</span>
+          <span className="sculpt-well-sm inline-flex h-7 items-center gap-2 px-3 text-[11.5px] font-semibold text-[#151922]">
+            <span className="truncate max-w-[170px]">{source?.name ?? "Source Video"}</span>
           </span>
           <Pill tone="neutral">
             {fmtTime(targetDuration)} • {platform.toUpperCase()}
           </Pill>
         </div>
 
-        {/* Tactile Progress Orb */}
+        {/* Sculpted Progress Ring */}
         <div className="relative mx-auto grid place-items-center">
-          <ProgressRing progress={procProgress} size={220}>
+          <ProgressRing progress={procProgress} size={200}>
             <div className="flex flex-col items-center">
-              <span className="text-[44px] font-bold leading-none tabular-nums tracking-tight text-[#1c2434]">
+              <span className="text-[40px] font-bold leading-none tabular-nums font-mono tracking-tight text-[#151922]">
                 {Math.floor(procProgress)}
-                <span className="text-[20px] font-semibold text-[#6b7791]">%</span>
+                <span className="text-[18px] font-semibold text-[#788296]">%</span>
               </span>
-              <span className="mt-2.5 flex items-center gap-1.5 text-[12.5px] font-semibold text-[#5160e8]">
-                <IconWave size={14} className="animate-pulse" />
+              <span className="mt-2 flex items-center gap-1.5 text-[12px] font-semibold text-[#3559cb]">
+                <IconWave size={13} className="animate-pulse" />
                 {t(STAGES[activeIdx].labelKey)}
               </span>
             </div>
           </ProgressRing>
         </div>
 
-        {/* Title & Stage Caption */}
-        <h1 className="mt-7 text-[28px] font-bold tracking-tight text-[#1c2434]">
+        {/* Status Text */}
+        <h1 className="mt-6 text-[25px] font-bold tracking-tight text-[#151922]">
           {mode === "analyze" ? t("procTitle") : t("procTitleDestill")}
         </h1>
-        <p className="mx-auto mt-2 h-7 max-w-[500px] text-[15px] text-[#4a566d]">
+        <p className="mx-auto mt-1.5 h-6 max-w-[480px] text-[14px] text-[#4d5566]">
           {t(STAGES[activeIdx].captionKey)}
         </p>
 
-        {/* Stage Steps Grid */}
-        <ol className="neu-inset mt-8 grid grid-cols-5 gap-1 rounded-[26px] p-2">
+        {/* 5-Stage Step Visualizer */}
+        <ol className="sculpt-well mt-7 grid grid-cols-5 gap-1 p-1.5">
           {STAGES.map((s, idx) => {
             const isDone = procProgress >= s.pct;
             const isActive = !isDone && idx === activeIdx;
@@ -79,23 +79,23 @@ export function Processing() {
                 key={s.id}
                 aria-current={isActive ? "step" : undefined}
                 className={cn(
-                  "flex flex-col items-center gap-1.5 rounded-[20px] py-3.5 transition-all duration-300",
-                  isActive ? "neu-raised-sm text-[#1c2434]" : isDone ? "text-[#1c2434]" : "text-[#6b7791]/60"
+                  "flex flex-col items-center gap-1 rounded-[14px] py-2.5 transition-all duration-200",
+                  isActive ? "sculpt-btn-raised text-[#151922]" : isDone ? "text-[#151922]" : "text-[#788296]/50"
                 )}
               >
                 <span
                   className={cn(
-                    "grid h-7 w-7 place-items-center rounded-full text-[11px] font-bold transition-all duration-300",
+                    "grid h-6 w-6 place-items-center rounded-full text-[10.5px] font-bold transition-all duration-200",
                     isDone
-                      ? "bg-[#1a886e]/15 text-[#1a886e]"
+                      ? "bg-[#0e6f64]/15 text-[#0e6f64]"
                       : isActive
-                      ? "bg-[#5160e8]/15 text-[#5160e8]"
-                      : "neu-inset-sm text-[#6b7791]"
+                      ? "bg-[#3559cb]/15 text-[#3559cb]"
+                      : "sculpt-well-sm text-[#788296]"
                   )}
                 >
-                  {isDone ? <IconCheck size={14} /> : idx + 1}
+                  {isDone ? <IconCheck size={12} /> : idx + 1}
                 </span>
-                <span className="text-[11px] font-semibold truncate max-w-full px-1">
+                <span className="text-[10.5px] font-semibold truncate max-w-full px-1">
                   {t(s.labelKey)}
                 </span>
               </li>
@@ -103,19 +103,19 @@ export function Processing() {
           })}
         </ol>
 
-        {/* Safe Cancellation Button */}
-        <div className="mt-8 flex flex-col items-center gap-3">
+        {/* Cancel Button */}
+        <div className="mt-7 flex flex-col items-center gap-2.5">
           <Button
             variant="ghost"
             size="sm"
-            icon={<IconClose size={15} />}
+            icon={<IconClose size={13} />}
             onClick={cancelRun}
           >
             {t("cancelBtn")}
           </Button>
 
-          <p className="flex items-center gap-1.5 text-[12px] font-medium text-[#6b7791]">
-            <IconLock size={13} />
+          <p className="flex items-center gap-1 text-[11.5px] font-medium text-[#788296]">
+            <IconLock size={12} />
             {t("procLocalNote")}
           </p>
         </div>

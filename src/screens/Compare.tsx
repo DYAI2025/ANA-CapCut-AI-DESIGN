@@ -37,7 +37,7 @@ export function Compare() {
   ];
 
   return (
-    <div className="mx-auto w-full max-w-[1080px] px-4 pb-24 pt-2 lg:px-6">
+    <div className="mx-auto w-full max-w-[1080px] px-4 pb-24 pt-1 lg:px-6">
       <ScreenHead
         kicker={t("cmpTitle")}
         tone="accent"
@@ -46,42 +46,42 @@ export function Compare() {
         sub={t("cmpSub")}
       />
 
-      <div className="grid gap-6 md:grid-cols-2 lg:gap-8">
+      <div className="grid gap-6 md:grid-cols-2 lg:gap-7">
         {takes.map((take) => {
           const isSelected = selectedTake === take.id;
 
           return (
             <Card
               key={take.id}
-              className="flex flex-col items-center gap-5 p-6 transition-all"
+              className="flex flex-col items-center gap-4.5 p-5.5 transition-all"
             >
-              <div className="flex w-full items-center justify-between border-b border-[#cfd6e3]/50 pb-2.5">
+              <div className="flex w-full items-center justify-between border-b border-[#c6ccd8]/50 pb-2">
                 <div className="flex items-center gap-2">
-                  <span className="grid h-6 w-6 place-items-center rounded-full bg-[#5160e8]/10 text-[12px] font-bold text-[#5160e8]">
+                  <span className="grid h-5.5 w-5.5 place-items-center rounded-full bg-[#3559cb]/10 text-[11px] font-bold text-[#3559cb]">
                     {take.id.toUpperCase()}
                   </span>
-                  <span className="text-[16px] font-bold text-[#1c2434] tracking-tight">
+                  <span className="text-[15.5px] font-bold text-[#151922] tracking-tight">
                     {take.label}
                   </span>
                 </div>
-                <Pill icon={<IconClock size={12} />}>{fmtTime(take.duration)}</Pill>
+                <Pill icon={<IconClock size={11} />}>{fmtTime(take.duration)}</Pill>
               </div>
 
               {/* 9:16 Video Frame */}
-              <div className="w-full max-w-[220px]">
+              <div className="w-full max-w-[210px]">
                 <PhoneFrame>
                   <Scene kind={take.scene} aspect="9/16" />
                 </PhoneFrame>
               </div>
 
               {/* Take Attributes */}
-              <div className="w-full space-y-2 text-left text-[12.5px] text-[#4a566d]">
-                <div className="neu-inset-sm rounded-[16px] p-3">
-                  <span className="font-bold text-[#1c2434] block mb-0.5">Hook Choice:</span>
+              <div className="w-full space-y-2 text-left text-[12px] text-[#4d5566]">
+                <div className="sculpt-well-sm p-2.5">
+                  <span className="font-bold text-[#151922] block mb-0.5">Hook Choice:</span>
                   {take.hookStyle}
                 </div>
-                <div className="neu-inset-sm rounded-[16px] p-3">
-                  <span className="font-bold text-[#1c2434] block mb-0.5">Rhythmic Profile:</span>
+                <div className="sculpt-well-sm p-2.5">
+                  <span className="font-bold text-[#151922] block mb-0.5">Rhythmic Profile:</span>
                   {take.pacing}
                 </div>
               </div>
@@ -90,7 +90,7 @@ export function Compare() {
               <Button
                 variant={isSelected ? "primary" : "secondary"}
                 size="lg"
-                icon={isSelected ? <IconCheck size={16} /> : undefined}
+                icon={isSelected ? <IconCheck size={15} /> : undefined}
                 className="w-full"
                 onClick={() => {
                   setSelectedTake(take.id);
@@ -105,11 +105,11 @@ export function Compare() {
         })}
       </div>
 
-      <div className="mt-8 flex justify-center">
+      <div className="mt-7 flex justify-center">
         <Button
           variant="secondary"
           size="md"
-          icon={<IconSpark size={16} />}
+          icon={<IconSpark size={15} />}
           onClick={() => go("result")}
         >
           Review in Full Screen Result

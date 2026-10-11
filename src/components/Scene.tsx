@@ -182,8 +182,8 @@ export function PhoneFrame({
   className?: string;
 }) {
   return (
-    <div className={cn("neu-inset rounded-[34px] p-3", className)}>
-      <div className="relative aspect-[9/16] w-full overflow-hidden rounded-[24px] bg-[#141824] shadow-[0_12px_28px_rgba(90,105,140,0.32)]">
+    <div className={cn("sculpt-well p-3", className)}>
+      <div className="relative aspect-[9/16] w-full overflow-hidden rounded-[20px] bg-[#111622] shadow-[0_12px_28px_rgba(21,25,34,0.35)]">
         {children}
       </div>
     </div>

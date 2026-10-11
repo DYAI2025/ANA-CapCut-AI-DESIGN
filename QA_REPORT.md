@@ -84,7 +84,25 @@ The following interactive user journeys were tested and verified against the imp
 
 ---
 
-## 3. Known Defects & Limitations
+## 3. Security Audit & Sourcery Remediation (16 Blocking Issues Resolved)
+
+Sourcery AI automated scanning flagged 16 blocking security issues in `destill/js/app.js` across lines 303, 317–329, 468, 521, 524, 534, and 548.
+
+### Root Cause Analysis
+- **Lines 303, 317–329, 468, 521, 524, 534, 548 (DOM-XSS / CWE-79):** Use of direct `innerHTML` or `insertAdjacentHTML` with unescaped variables (`source.name`, `file.name`, `claim.text`, `prompt`).
+- **Line 548 (Unsafe Attribute Injection & Insecure Scheme):** Multiple attribute string concatenations inside template strings without URL sanitization.
+- **Insecure Clipboard Call:** Use of legacy `document.execCommand('copy')`.
+
+### Applied Security Patches
+1. **Replaced all `innerHTML` assignments with Safe DOM Methods:** Converted to `document.createElement()`, `element.textContent`, and `element.replaceChildren()`, rendering DOM-based Cross-Site Scripting impossible.
+2. **Strict URL Scheme Sanitizer (`sanitizeUrl`):** Blocks `javascript:`, `vbscript:`, and unsafe data schemes; only allows `blob:`, `data:image/`, and safe relative/https URLs.
+3. **HTML Sanitization Helper (`escapeHtml`):** Encodes `&`, `<`, `>`, `"`, and `'`.
+4. **Modern Secure Clipboard API:** Replaced deprecated `execCommand` with `navigator.clipboard.writeText` protected within user-gesture handlers.
+5. **Memory Leak Guard:** Strict `URL.revokeObjectURL` lifecycle cleanup when files are replaced or removed.
+
+---
+
+## 4. Known Defects & Limitations
 
 1. **HEVC / ProRes Browser Decoding Constraints:**
    - Standard Chromium web browsers cannot natively decode 10-bit 4:2:2 ProRes MOV files without local proxy transcoding.

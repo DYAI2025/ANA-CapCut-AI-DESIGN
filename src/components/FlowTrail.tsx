@@ -5,7 +5,6 @@ import { IconCheck } from "../lib/icons";
 export function FlowTrail() {
   const { t, screen, go, source, mode } = useApp();
 
-  // Active step calculation
   let activeIndex = 0;
   if (screen === "home" || screen === "blocked") {
     activeIndex = source ? 1 : 0;
@@ -16,7 +15,6 @@ export function FlowTrail() {
   } else if (screen === "result" || screen === "decision") {
     activeIndex = 3;
   } else {
-    // Secondary screens
     return null;
   }
 
@@ -34,9 +32,9 @@ export function FlowTrail() {
   return (
     <nav
       aria-label="Workflow progress"
-      className="mx-auto my-3 flex w-fit items-center justify-center rounded-full p-1.5"
+      className="mx-auto my-2.5 flex w-fit items-center justify-center"
     >
-      <ol className="neu-inset-sm flex items-center gap-1 rounded-full p-1 sm:p-1.5">
+      <ol className="sculpt-well-sm flex items-center gap-1 p-1 sm:p-1.5">
         {steps.map((s, idx) => {
           const isDone = idx < activeIndex;
           const isActive = idx === activeIndex;
@@ -51,23 +49,23 @@ export function FlowTrail() {
                   if (isNavigable) go(s.screen);
                 }}
                 className={cn(
-                  "flex h-7.5 items-center gap-1.5 rounded-full px-3 text-[12.5px] font-semibold transition-all duration-200",
+                  "flex h-7 items-center gap-1.5 rounded-[10px] px-2.5 text-[12px] font-semibold transition-all duration-150",
                   isActive
-                    ? "neu-raised-xs text-[#5160e8]"
+                    ? "sculpt-btn-raised text-[#3559cb]"
                     : isDone
-                    ? "text-[#1c2434] hover:text-[#5160e8]"
-                    : "text-[#6b7791]/60 cursor-not-allowed"
+                    ? "text-[#151922] hover:text-[#3559cb]"
+                    : "text-[#788296]/60 cursor-not-allowed"
                 )}
               >
                 {isDone ? (
-                  <span className="grid h-4 w-4 place-items-center rounded-full bg-[#1a886e]/15 text-[#1a886e]">
+                  <span className="grid h-4 w-4 place-items-center rounded-full bg-[#0e6f64]/15 text-[#0e6f64]">
                     <IconCheck size={11} />
                   </span>
                 ) : (
                   <span
                     className={cn(
                       "grid h-4 w-4 place-items-center rounded-full text-[10px] font-bold tabular-nums",
-                      isActive ? "bg-[#5160e8]/15 text-[#5160e8]" : "bg-black/5 text-[#6b7791]"
+                      isActive ? "bg-[#3559cb]/15 text-[#3559cb]" : "bg-black/5 text-[#788296]"
                     )}
                   >
                     {idx + 1}
@@ -76,7 +74,7 @@ export function FlowTrail() {
                 <span>{s.label}</span>
               </button>
               {idx < steps.length - 1 && (
-                <span className="mx-1 h-0.5 w-3 rounded-full bg-[#cfd6e3]" />
+                <span className="mx-1 h-0.5 w-2.5 rounded-full bg-[#c6ccd8]" />
               )}
             </li>
           );

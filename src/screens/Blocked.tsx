@@ -15,6 +15,7 @@ import { cn } from "../utils/cn";
 interface BlockConfig {
   icon: typeof IconVideo;
   tone: PillTone;
+  stateCode: string;
   titleKey: DictKey;
   descKey: DictKey;
   primaryActionKey: DictKey;
@@ -39,6 +40,7 @@ export function Blocked() {
     nofile: {
       icon: IconVideo,
       tone: "accent",
+      stateCode: "S2 / S7 — SOURCE_EMPTY",
       titleKey: "errNoFileTitle",
       descKey: "errNoFileDesc",
       primaryActionKey: "errNoFileAction",
@@ -49,6 +51,7 @@ export function Blocked() {
     unsupported: {
       icon: IconAlert,
       tone: "rose",
+      stateCode: "S7 — CODEC_PREVIEW_LIMITATION",
       titleKey: "errUnsupportedTitle",
       descKey: "errUnsupportedDesc",
       primaryActionKey: "errUnsupportedAction",
@@ -59,6 +62,7 @@ export function Blocked() {
     unavailable: {
       icon: IconSettings,
       tone: "amber",
+      stateCode: "S2 — ENGINE_DAEMON_OFFLINE",
       titleKey: "errUnavailableTitle",
       descKey: "errUnavailableDesc",
       primaryActionKey: "errUnavailableAction",
@@ -73,6 +77,7 @@ export function Blocked() {
     notready: {
       icon: IconClock,
       tone: "neutral",
+      stateCode: "S2 — ANALYSIS_NOT_READY",
       titleKey: "errNotReadyTitle",
       descKey: "errNotReadyDesc",
       primaryActionKey: "errNotReadyAction",
@@ -81,6 +86,7 @@ export function Blocked() {
     consent_missing: {
       icon: IconLock,
       tone: "amber",
+      stateCode: "S2 — CONSENT_GATED",
       titleKey: "errConsentTitle",
       descKey: "errConsentDesc",
       primaryActionKey: "errConsentAction",
@@ -94,60 +100,60 @@ export function Blocked() {
   const IconComponent = cfg.icon;
 
   return (
-    <div className="mx-auto flex min-h-[calc(100vh-220px)] w-full max-w-[620px] items-center px-4 py-8">
-      <Card className="flex w-full flex-col items-center px-6 py-10 text-center sm:px-12 sm:py-12">
-        {/* Soft Neumorphic Status Well */}
-        <div className="neu-raised grid h-[120px] w-[120px] place-items-center rounded-full">
+    <div className="mx-auto flex min-h-[calc(100vh-220px)] w-full max-w-[600px] items-center px-4 py-6">
+      <Card className="flex w-full flex-col items-center px-6 py-9 text-center sm:px-10 sm:py-11">
+        {/* Sculpted Well Medallion */}
+        <div className="sculpt-well grid h-[104px] w-[104px] place-items-center rounded-full">
           <div
             className={cn(
-              "neu-inset grid h-[88px] w-[88px] place-items-center rounded-full",
+              "sculpt-btn-raised grid h-[76px] w-[76px] place-items-center rounded-full",
               cfg.tone === "accent"
-                ? "text-[#5160e8]"
+                ? "text-[#3559cb]"
                 : cfg.tone === "rose"
-                ? "text-[#cc3d61]"
+                ? "text-[#a8301f]"
                 : cfg.tone === "amber"
-                ? "text-[#bd730a]"
-                : "text-[#6b7791]"
+                ? "text-[#7d4508]"
+                : "text-[#4d5566]"
             )}
           >
-            <IconComponent size={36} strokeWidth={1.7} />
+            <IconComponent size={32} strokeWidth={1.7} />
           </div>
         </div>
 
-        <div className="mt-7">
+        <div className="mt-6">
           <Pill tone={cfg.tone} dot>
-            {t("blockedKicker")}
+            {cfg.stateCode}
           </Pill>
         </div>
 
-        <h2 className="mt-4 text-[26px] font-bold leading-tight tracking-tight text-[#1c2434] sm:text-[30px]">
+        <h2 className="mt-3.5 text-[24px] font-bold leading-tight tracking-tight text-[#151922] sm:text-[28px]">
           {t(cfg.titleKey)}
         </h2>
 
-        <p className="mt-2.5 max-w-[420px] text-[15px] leading-relaxed text-[#4a566d]">
+        <p className="mt-2 max-w-[400px] text-[14px] leading-relaxed text-[#4d5566]">
           {t(cfg.descKey)}
         </p>
 
-        {/* Diagnostic Metadata Container */}
-        <div className="neu-inset-sm mt-7 flex w-full max-w-[420px] flex-col gap-1 rounded-2xl p-3.5 text-left text-[12px] font-mono text-[#6b7791]">
+        {/* Truthful Engine vs Browser Diagnostic Notice */}
+        <div className="sculpt-well-sm mt-6 flex w-full max-w-[400px] flex-col gap-1.5 p-3.5 text-left text-[11.5px] font-mono text-[#4d5566]">
           <div className="flex justify-between">
-            <span className="font-semibold text-[#1c2434]">Condition:</span>
+            <span className="font-semibold text-[#151922]">Diagnostic State:</span>
             <span>{blockKind.toUpperCase()}</span>
           </div>
           {rejectedFileName && (
             <div className="flex justify-between">
-              <span className="font-semibold text-[#1c2434]">File Track:</span>
-              <span className="truncate max-w-[240px] text-[#cc3d61]">{rejectedFileName}</span>
+              <span className="font-semibold text-[#151922]">Target Container:</span>
+              <span className="truncate max-w-[210px] text-[#a8301f]">{rejectedFileName}</span>
             </div>
           )}
-          <div className="flex justify-between">
-            <span className="font-semibold text-[#1c2434]">Execution Layer:</span>
-            <span>Local Mac Sandbox</span>
+          <div className="flex justify-between border-t border-[#c6ccd8]/50 pt-1 text-[11px]">
+            <span className="text-[#788296]">Engine Distinction:</span>
+            <span className="text-[#0e6f64]">Browser playback limit ≠ FFmpeg offline limit</span>
           </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+        <div className="mt-7 flex flex-wrap items-center justify-center gap-2.5">
           {cfg.secondaryAction && cfg.secondaryActionKey && (
             <Button variant="secondary" size="md" onClick={cfg.secondaryAction}>
               {t(cfg.secondaryActionKey)}

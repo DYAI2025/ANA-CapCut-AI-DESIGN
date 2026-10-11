@@ -19,7 +19,7 @@ export function TopBar() {
   } = useApp();
 
   return (
-    <header className="sticky top-0 z-40 bg-[#edf0f5]/85 px-4 pt-3 pb-3 backdrop-blur-md lg:px-6">
+    <header className="sticky top-0 z-40 bg-[#eef1f6]/90 px-4 pt-3 pb-3 backdrop-blur-md lg:px-6">
       <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between gap-3">
         {/* Brand identity */}
         <div className="flex items-center gap-3">
@@ -28,17 +28,17 @@ export function TopBar() {
             onClick={() => go("home")}
             className="group flex items-center gap-2.5 text-left select-none"
           >
-            <Logo size={42} />
+            <Logo size={40} />
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[19px] font-bold tracking-tight text-[#1c2434]">
+                <span className="text-[18.5px] font-bold tracking-tight text-[#151922]">
                   {t("brandName")}
                 </span>
-                <span className="rounded-md bg-[#5160e8]/10 px-1.5 py-0.5 text-[10.5px] font-bold text-[#5160e8]">
+                <span className="rounded-md bg-[#3559cb]/10 px-1.5 py-0.5 text-[10px] font-bold text-[#3559cb]">
                   v0.2
                 </span>
               </div>
-              <span className="hidden text-[11px] font-medium tracking-tight text-[#6b7791] sm:block">
+              <span className="hidden text-[11px] font-medium tracking-tight text-[#788296] sm:block">
                 {t("brandKicker")}
               </span>
             </div>
@@ -49,7 +49,7 @@ export function TopBar() {
         <div
           role="group"
           aria-label="Product Capability Mode"
-          className="neu-inset-sm hidden items-center gap-1 rounded-full p-1 sm:flex"
+          className="sculpt-well-sm hidden items-center gap-1 p-1 sm:flex"
         >
           <Tooltip label={t("modeAnalyzeDesc")} side="bottom">
             <button
@@ -59,13 +59,13 @@ export function TopBar() {
                 if (screen === "result") go("understanding");
               }}
               className={cn(
-                "flex h-8 items-center gap-1.5 rounded-full px-3.5 text-[12.5px] font-semibold transition-all duration-200",
+                "flex h-7.5 items-center gap-1.5 rounded-[10px] px-3 text-[12px] font-semibold transition-all duration-150",
                 mode === "analyze"
-                  ? "neu-raised-xs text-[#5160e8]"
-                  : "text-[#6b7791] hover:text-[#1c2434]"
+                  ? "sculpt-btn-raised text-[#3559cb]"
+                  : "text-[#788296] hover:text-[#151922]"
               )}
             >
-              <IconWave size={14} />
+              <IconWave size={13} />
               {t("modeAnalyze")}
             </button>
           </Tooltip>
@@ -78,20 +78,20 @@ export function TopBar() {
                 if (screen === "understanding") go("result");
               }}
               className={cn(
-                "flex h-8 items-center gap-1.5 rounded-full px-3.5 text-[12.5px] font-semibold transition-all duration-200",
+                "flex h-7.5 items-center gap-1.5 rounded-[10px] px-3 text-[12px] font-semibold transition-all duration-150",
                 mode === "destill"
-                  ? "neu-raised-xs text-[#1c2434]"
-                  : "text-[#6b7791] hover:text-[#1c2434]"
+                  ? "sculpt-btn-raised text-[#151922]"
+                  : "text-[#788296] hover:text-[#151922]"
               )}
             >
-              <IconSpark size={14} />
+              <IconSpark size={13} />
               {t("modeDestill")}
             </button>
           </Tooltip>
         </div>
 
         {/* System & Localization Utilities */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2">
           {/* Privacy Guarantee */}
           <Tooltip label={t("localGuaranteeTooltip")} side="bottom">
             <Pill tone="mint" icon={<IconLock size={12} />} className="hidden md:inline-flex">
@@ -102,7 +102,7 @@ export function TopBar() {
           {/* Engine Status */}
           <Tooltip label={engineOnline ? t("engineReady") : t("enginePaused")} side="bottom">
             <Pill tone={engineOnline ? "mint" : "amber"} dot className="hidden lg:inline-flex">
-              {engineOnline ? "Ready" : "Paused"}
+              {engineOnline ? "Engine Online" : "Engine Paused"}
             </Pill>
           </Tooltip>
 
@@ -110,9 +110,9 @@ export function TopBar() {
           <div
             role="group"
             aria-label="Select Language"
-            className="neu-inset-sm flex items-center rounded-full p-1"
+            className="sculpt-well-sm flex items-center p-0.5"
           >
-            <span className="hidden px-1.5 text-[#6b7791] sm:inline">
+            <span className="hidden px-1.5 text-[#788296] sm:inline">
               <IconGlobe size={13} />
             </span>
             {LANG_OPTIONS.map((l) => (
@@ -122,10 +122,10 @@ export function TopBar() {
                 onClick={() => setLang(l.id)}
                 aria-pressed={lang === l.id}
                 className={cn(
-                  "h-6.5 rounded-full px-2 text-[11px] font-bold uppercase tracking-wider transition-all duration-200",
+                  "h-6.5 rounded-[9px] px-2 text-[11px] font-bold uppercase tracking-wider transition-all duration-150",
                   lang === l.id
-                    ? "neu-raised-xs text-[#1c2434]"
-                    : "text-[#6b7791] hover:text-[#4a566d]"
+                    ? "sculpt-btn-raised text-[#151922]"
+                    : "text-[#788296] hover:text-[#4d5566]"
                 )}
               >
                 {l.label}

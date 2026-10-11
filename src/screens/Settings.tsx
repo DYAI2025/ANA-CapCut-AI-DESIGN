@@ -35,7 +35,7 @@ export function Settings() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-[800px] px-4 pb-24 pt-2 lg:px-6">
+    <div className="mx-auto w-full max-w-[800px] px-4 pb-24 pt-1 lg:px-6">
       <ScreenHead
         kicker={t("settTitle")}
         tone="accent"
@@ -44,17 +44,17 @@ export function Settings() {
         sub={t("settSub")}
       />
 
-      <div className="space-y-6">
-        <Card className="px-6 py-3 sm:px-8">
+      <div className="space-y-5">
+        <Card className="px-5 py-2.5 sm:px-7">
           <SettingList>
             {/* Language Selection */}
             <SettingRow
-              icon={<IconGlobe size={18} />}
+              icon={<IconGlobe size={17} />}
               label={t("settLanguage")}
-              desc="Active localization for interface labels and transcripts."
+              desc="Interface labels and transcripts localization."
             >
               <Segmented<Lang>
-                className="w-[180px]"
+                className="w-[170px]"
                 value={lang}
                 onChange={setLang}
                 options={LANG_OPTIONS.map((l) => ({ value: l.id, label: l.label }))}
@@ -63,20 +63,20 @@ export function Settings() {
 
             {/* Privacy Architecture Statement */}
             <SettingRow
-              icon={<IconLock size={18} />}
+              icon={<IconLock size={17} />}
               label={t("settPrivacy")}
               desc={t("settPrivacyDesc")}
             >
-              <Pill tone="mint">Local-First</Pill>
+              <Pill tone="mint">Local-First Sandbox</Pill>
             </SettingRow>
 
             {/* Local Engine Toggle */}
             <SettingRow
-              icon={<IconWave size={18} />}
+              icon={<IconWave size={17} />}
               label={t("settLocalEngine")}
               desc={t("settLocalEngineDesc")}
             >
-              <div className="flex items-center gap-2.5">
+              <div className="flex items-center gap-2">
                 <Pill tone={engineOnline ? "mint" : "amber"}>
                   {engineOnline ? "Online" : "Paused"}
                 </Pill>
@@ -90,21 +90,21 @@ export function Settings() {
 
             {/* Model & Cache Storage */}
             <SettingRow
-              icon={<IconLayers size={18} />}
+              icon={<IconLayers size={17} />}
               label={t("settStorage")}
               desc={t("settStorageDesc")}
             >
-              <div className="flex items-center gap-2.5">
-                <span className="font-mono text-[13px] font-bold text-[#1c2434]">{cacheSize}</span>
-                <Button size="sm" variant="utility" icon={<IconTrash size={13} />} onClick={handleClearCache}>
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-[12.5px] font-bold text-[#151922]">{cacheSize}</span>
+                <Button size="sm" variant="utility" icon={<IconTrash size={12} />} onClick={handleClearCache}>
                   {t("settClearStorage")}
                 </Button>
               </div>
             </SettingRow>
 
-            {/* Calm Motion Accessibility Mode */}
+            {/* Calm Motion Mode */}
             <SettingRow
-              icon={<IconInfo size={18} />}
+              icon={<IconInfo size={17} />}
               label={t("settCalmMotion")}
               desc={t("settCalmMotionDesc")}
             >
@@ -117,7 +117,7 @@ export function Settings() {
 
             {/* Hints Toggle */}
             <SettingRow
-              icon={<IconInfo size={18} />}
+              icon={<IconInfo size={17} />}
               label={t("settHints")}
               desc={t("settHintsDesc")}
             >
@@ -130,13 +130,12 @@ export function Settings() {
           </SettingList>
         </Card>
 
-        {/* Prototype Version & Definition of Ready Notice */}
-        <div className="rounded-[24px] bg-black/5 p-5 text-center text-[12px] leading-relaxed text-[#6b7791]">
-          <div className="font-semibold text-[#1c2434] mb-1">
-            DESTILL HYBRID v0.2 — DEFINITION OF READY ARTIFACT
-          </div>
-          Designed autonomously for creator Ana. Separates multimodal video understanding from automated cut generation.
-          Zero external billable API spending.
+        {/* Prototype Version Notice */}
+        <div className="sculpt-well-sm p-4 text-center text-[11.5px] leading-relaxed text-[#788296]">
+          <strong className="text-[#151922] block mb-0.5">
+            DESTILL — Sculpted Light / Premium Product UI v0.2
+          </strong>
+          Designed for creator Ana. Built in single end-to-end execution. Zero billable external API spending.
         </div>
       </div>
     </div>
