@@ -159,7 +159,7 @@ const toneCls: Record<PillTone, string> = {
 };
 
 const dotBg: Record<PillTone, string> = {
-  neutral: "bg-[#788296]",
+  neutral: "bg-[#606d81]",
   accent: "bg-[#3559cb]",
   mint: "bg-[#0e6f64]",
   amber: "bg-[#7d4508]",
@@ -302,7 +302,7 @@ export function Segmented<T extends string>({
             onClick={() => onChange(o.value)}
             className={cn(
               "relative z-10 flex h-9.5 items-center justify-center gap-1.5 px-3 text-[13px] font-semibold transition-colors duration-150 select-none",
-              active ? "text-[#151922]" : "text-[#788296] hover:text-[#4d5566]"
+              active ? "text-[#151922]" : "text-[#606d81] hover:text-[#151922]"
             )}
           >
             {o.icon && <span className={active ? "text-[#3559cb]" : ""}>{o.icon}</span>}
@@ -417,7 +417,7 @@ export function SettingRow({
         )}
         <div className="min-w-0">
           <div className="text-[14.5px] font-semibold tracking-tight text-[#151922]">{label}</div>
-          {desc && <div className="text-[12px] text-[#788296] leading-snug">{desc}</div>}
+          {desc && <div className="text-[12px] text-[#606d81] leading-snug">{desc}</div>}
         </div>
       </div>
       <div className="shrink-0">{children}</div>

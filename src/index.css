@@ -15,6 +15,7 @@
   --surface-lift: #fbfcfd;
   --ink: #151922;
   --ink-muted: #4d5566;
+  --ink-support: #606d81;
   --ink-faint: #788296;
   --accent: #3559cb;
   --accent-soft: #e6ecff;
@@ -397,6 +398,39 @@
 
 .sculpt-range:hover::-webkit-slider-thumb {
   transform: scale(1.08);
+}
+
+/* Timeline & Video Player Scrubber Thumb Knob */
+.sculpt-thumb-knob {
+  width: 18px;
+  height: 18px;
+  border-radius: var(--radius-pill);
+  background:
+    radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0) 60%),
+    linear-gradient(150deg, #ffffff 0%, #e2e8f0 100%);
+  box-shadow:
+    0 2px 5px rgba(21, 25, 34, 0.28),
+    0 4px 10px rgba(154, 168, 188, 0.35),
+    inset 0 1px 1px rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  cursor: grab;
+  transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.15s ease;
+}
+
+.sculpt-thumb-knob:hover {
+  transform: scale(1.15);
+  box-shadow:
+    0 3px 8px rgba(21, 25, 34, 0.32),
+    0 6px 14px rgba(154, 168, 188, 0.40),
+    inset 0 1px 1px #ffffff;
+}
+
+.sculpt-thumb-knob:active {
+  cursor: grabbing;
+  transform: scale(1.05);
+  box-shadow:
+    0 1px 3px rgba(21, 25, 34, 0.30),
+    inset 0 1px 2px rgba(154, 168, 188, 0.35);
 }
 
 /* Optical Groove Separator */

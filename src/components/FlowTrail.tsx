@@ -54,7 +54,7 @@ export function FlowTrail() {
                     ? "sculpt-btn-raised text-[#3559cb]"
                     : isDone
                     ? "text-[#151922] hover:text-[#3559cb]"
-                    : "text-[#788296]/60 cursor-not-allowed"
+                    : "text-[#606d81]/60 cursor-not-allowed"
                 )}
               >
                 {isDone ? (
@@ -65,7 +65,7 @@ export function FlowTrail() {
                   <span
                     className={cn(
                       "grid h-4 w-4 place-items-center rounded-full text-[10px] font-bold tabular-nums",
-                      isActive ? "bg-[#3559cb]/15 text-[#3559cb]" : "bg-black/5 text-[#788296]"
+                      isActive ? "bg-[#3559cb]/15 text-[#3559cb]" : "bg-black/5 text-[#606d81]"
                     )}
                   >
                     {idx + 1}

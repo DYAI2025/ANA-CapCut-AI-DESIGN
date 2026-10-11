@@ -39,8 +39,6 @@ export function Result() {
   const [playing, setPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [exportModalOpen, setExportModalOpen] = useState(false);
-  const [exportOption, setExportOption] = useState<"video" | "prompt" | "both">("both");
-  const [exportPhase, setExportPhase] = useState<"idle" | "busy" | "done">("idle");
 
   const promptText = useMemo(() => {
     return plan.capCutEditPilotPrompt;
@@ -58,18 +56,42 @@ export function Result() {
     go("home");
   };
 
-  const startExportSimulation = () => {
-    setExportPhase("busy");
-    setTimeout(() => {
-      setExportPhase("done");
-    }, 1200);
+  // Real Edit Decision List (.json) file generation and download
+  const handleDownloadEDL = () => {
+    const edlData = {
+      project: "Destill Candidate Cut",
+      sourceAsset: source?.name ?? "Lisbon_trip_raw_0412.mov",
+      targetDurationSeconds: plan.actualDurationSeconds,
+      platform: platform,
+      segments: plan.segments,
+      editorialRationale: plan.editorialRationale,
+      capCutPrompt: plan.capCutEditPilotPrompt,
+      metadata: {
+        rawDuration: source?.formattedDuration ?? "18:36",
+        renderedMp4Status: "NOT_RENDERED_DEMO_PREVIEW",
+        exportedAt: new Date().toISOString(),
+      },
+    };
+
+    const blob = new Blob([JSON.stringify(edlData, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `destill_edit_decision_${Date.now()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast("Downloaded Edit Decision List (.json)");
   };
 
   return (
     <div className="mx-auto w-full max-w-[1380px] px-4 pb-24 pt-1 lg:px-6">
       {/* Screen Head */}
       <ScreenHead
-        kicker="S6 — Candidate Edit Preview"
+        kicker="S6 — Proposed Candidate Cut"
         tone="mint"
         icon={<IconSpark size={13} />}
         title={t("resTitle")}
@@ -88,10 +110,7 @@ export function Result() {
               variant="primary"
               size="md"
               icon={<IconDownload size={14} />}
-              onClick={() => {
-                setExportPhase("idle");
-                setExportModalOpen(true);
-              }}
+              onClick={() => setExportModalOpen(true)}
             >
               {t("exportBtn")}
             </Button>
@@ -100,13 +119,15 @@ export function Result() {
       />
 
       {/* S6 Honest Result Watermark Notice */}
-      <div className="sculpt-well-sm mb-5 flex items-center justify-between gap-3 p-3 text-[12px] text-[#4d5566]">
+      <div className="sculpt-well-sm mb-5 flex flex-wrap items-center justify-between gap-3 p-3.5 text-[12px] text-[#4d5566]">
         <div className="flex items-center gap-2">
-          <IconInfo size={15} className="text-[#0e6f64] shrink-0" />
-          <span className="font-semibold text-[#151922]">PREVIEW_UNAVAILABLE / NOT_RENDERED: </span>
-          <span>{t("resDemoWatermark")}</span>
+          <IconInfo size={15} className="text-[#3559cb] shrink-0" />
+          <strong className="text-[#151922]">DEMO CANDIDATE PREVIEW — MP4 NOT RENDERED: </strong>
+          <span>Showing proposed short cut structure and CapCut EditPilot prompt. Local rendering pipeline pending.</span>
         </div>
-        <Pill tone="mint">Planned Target: {fmtTime(plan.actualDurationSeconds)}</Pill>
+        <div className="flex items-center gap-2">
+          <Pill tone="mint">Planned Target: {fmtTime(plan.actualDurationSeconds)}</Pill>
+        </div>
       </div>
 
       {/* Main Grid: Left 9:16 Video Player, Right Rationale & CapCut Prompt */}
@@ -118,8 +139,8 @@ export function Result() {
               <div className="relative h-full w-full">
                 <Scene kind="dawn" aspect="9/16" />
 
-                {/* Subtitle simulation with clean Montserrat aesthetic */}
-                <div className="absolute inset-x-3 bottom-14 rounded-[12px] bg-black/80 px-3 py-1.5 text-center text-[12px] font-bold text-white tracking-wide backdrop-blur-md">
+                {/* Subtitle simulation with clean typography */}
+                <div className="absolute inset-x-3 bottom-14 rounded-[12px] bg-black/85 px-3 py-1.5 text-center text-[12px] font-bold text-white tracking-wide backdrop-blur-md">
                   "If you need 40 seconds to explain it, you lost the feed."
                 </div>
 
@@ -154,14 +175,14 @@ export function Result() {
                   style={{ width: `${(currentTime / plan.actualDurationSeconds) * 100}%` }}
                 />
               </div>
-              <span className="font-mono text-[10.5px] font-semibold text-[#788296]">
+              <span className="font-mono text-[10.5px] font-semibold text-[#606d81] tabular-nums">
                 {fmtTime(currentTime)} / {fmtTime(plan.actualDurationSeconds)}
               </span>
             </div>
 
             {/* KEEP / CHANGE / DROP Feedback Actions */}
             <div className="w-full border-t border-[#c6ccd8]/50 pt-3.5">
-              <div className="text-[11px] font-bold uppercase tracking-wider text-[#788296] text-center mb-2.5">
+              <div className="text-[11px] font-bold uppercase tracking-wider text-[#606d81] text-center mb-2.5">
                 {t("feedbackSub")}
               </div>
               <div className="grid grid-cols-3 gap-2">
@@ -195,10 +216,10 @@ export function Result() {
           {/* Metric Comparison Card */}
           <Card className="grid grid-cols-2 gap-2.5 p-4 text-center">
             <div className="sculpt-well-sm p-2.5">
-              <div className="text-[10px] font-bold text-[#788296] uppercase tracking-wider">
+              <div className="text-[10px] font-bold text-[#606d81] uppercase tracking-wider">
                 {t("metricsSourceDuration")}
               </div>
-              <div className="mt-0.5 font-mono text-[15px] font-bold text-[#151922]">
+              <div className="mt-0.5 font-mono text-[15px] font-bold text-[#151922] tabular-nums">
                 {source?.formattedDuration ?? "18:36"}
               </div>
             </div>
@@ -206,7 +227,7 @@ export function Result() {
               <div className="text-[10px] font-bold text-[#3559cb] uppercase tracking-wider">
                 {t("metricsCutDuration")}
               </div>
-              <div className="mt-0.5 font-mono text-[15px] font-bold text-[#3559cb]">
+              <div className="mt-0.5 font-mono text-[15px] font-bold text-[#3559cb] tabular-nums">
                 {fmtTime(plan.actualDurationSeconds)}
               </div>
             </div>
@@ -214,7 +235,7 @@ export function Result() {
               <div className="text-[10px] font-bold text-[#0e6f64] uppercase tracking-wider">
                 {t("metricsPreservedMoments")}
               </div>
-              <div className="mt-0.5 font-mono text-[15px] font-bold text-[#0e6f64]">
+              <div className="mt-0.5 font-mono text-[15px] font-bold text-[#0e6f64] tabular-nums">
                 {plan.preservedMomentsCount} takes
               </div>
             </div>
@@ -222,7 +243,7 @@ export function Result() {
               <div className="text-[10px] font-bold text-[#7d4508] uppercase tracking-wider">
                 {t("metricsRemovedMoments")}
               </div>
-              <div className="mt-0.5 font-mono text-[15px] font-bold text-[#7d4508]">
+              <div className="mt-0.5 font-mono text-[15px] font-bold text-[#7d4508] tabular-nums">
                 {plan.removedMomentsCount} trimmed
               </div>
             </div>
@@ -272,22 +293,22 @@ export function Result() {
 
             {/* Preserved Segments List */}
             <div>
-              <div className="text-[11.5px] font-bold uppercase tracking-wider text-[#788296] mb-2">
-                Planned Assembly Segments
+              <div className="text-[11.5px] font-bold uppercase tracking-wider text-[#606d81] mb-2">
+                Planned Assembly Segments (5 Takes)
               </div>
               <div className="space-y-1.5">
                 {plan.segments.map((seg, i) => (
                   <div
                     key={seg.id}
-                    className="sculpt-well-sm flex items-center justify-between gap-3 px-3.5 py-2 text-[12.5px]"
+                    className="sculpt-well-sm flex items-center justify-between gap-3 px-3.5 py-2.5 text-[12.5px]"
                   >
                     <div className="flex items-center gap-2.5">
-                      <span className="grid h-5 w-5 place-items-center rounded-full bg-white text-[10.5px] font-bold text-[#3559cb]">
+                      <span className="grid h-5 w-5 place-items-center rounded-full bg-white text-[10.5px] font-bold text-[#3559cb] tabular-nums">
                         {i + 1}
                       </span>
                       <span className="font-semibold text-[#151922]">{seg.title}</span>
                     </div>
-                    <div className="flex items-center gap-2 font-mono text-[11.5px] text-[#788296]">
+                    <div className="flex items-center gap-2 font-mono text-[11.5px] text-[#606d81] tabular-nums">
                       <span>Source {fmtTime(seg.sourceStart)}–{fmtTime(seg.sourceEnd)}</span>
                       <span>→</span>
                       <span className="text-[#3559cb] font-bold">{fmtTime(seg.cutStart)}–{fmtTime(seg.cutEnd)}</span>
@@ -306,19 +327,21 @@ export function Result() {
                   <IconWand size={16} className="text-[#3559cb]" />
                   {t("promptTitle")}
                 </div>
-                <p className="mt-0.5 text-[12.5px] text-[#788296]">
+                <p className="mt-0.5 text-[12.5px] text-[#606d81]">
                   {t("promptSub")}
                 </p>
               </div>
 
-              <Button
-                variant="primary"
-                size="md"
-                icon={<IconCopy size={14} />}
-                onClick={() => copyText(promptText)}
-              >
-                {t("copyPromptBtn")}
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="primary"
+                  size="md"
+                  icon={<IconCopy size={14} />}
+                  onClick={() => copyText(promptText)}
+                >
+                  {t("copyPromptBtn")}
+                </Button>
+              </div>
             </div>
 
             {/* Prompt Text Box */}
@@ -329,74 +352,88 @@ export function Result() {
         </div>
       </div>
 
-      {/* Export Modal */}
+      {/* Honest Export & Handoff Modal */}
       {exportModalOpen && (
         <Modal onClose={() => setExportModalOpen(false)}>
           <Card className="p-6 sm:p-7">
-            {exportPhase === "done" ? (
-              <div className="flex flex-col items-center gap-3.5 py-3 text-center">
-                <span className="grid h-14 w-14 place-items-center rounded-full bg-[#0e6f64]/15 text-[#0e6f64]">
-                  <IconCheck size={28} />
-                </span>
+            <div className="flex flex-col gap-4.5">
+              <div className="flex items-center justify-between border-b border-[#c6ccd8]/50 pb-2.5">
                 <div>
-                  <h3 className="text-[18px] font-bold text-[#151922]">
-                    {t("exportSimulatedDone")}
+                  <h3 className="text-[17.5px] font-bold text-[#151922] tracking-tight">
+                    Export & CapCut Handoff
                   </h3>
-                  <p className="mt-1 text-[13px] text-[#788296]">
-                    Artifacts packaged locally for CapCut desktop/mobile import.
-                  </p>
+                  <span className="text-[11.5px] text-[#606d81]">
+                    Candidate cut ready for external editor assembly
+                  </span>
                 </div>
-                <Button variant="primary" size="md" onClick={() => setExportModalOpen(false)}>
-                  {t("exportClose")}
+                <Pill tone="mint">Local Handoff</Pill>
+              </div>
+
+              <div className="flex flex-col gap-3">
+                {/* Option 1: Copy CapCut EditPilot Prompt */}
+                <div className="sculpt-well-sm flex items-center justify-between p-3.5 gap-3">
+                  <div className="flex items-center gap-3">
+                    <span className="grid h-9 w-9 place-items-center rounded-xl bg-[#3559cb]/10 text-[#3559cb]">
+                      <IconCopy size={16} />
+                    </span>
+                    <div>
+                      <div className="text-[13px] font-bold text-[#151922]">
+                        CapCut EditPilot Prompt
+                      </div>
+                      <div className="text-[11.5px] text-[#606d81]">
+                        Copy prompt directly into CapCut AI Script / Generator
+                      </div>
+                    </div>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="primary"
+                    icon={<IconCopy size={12} />}
+                    onClick={() => copyText(promptText)}
+                  >
+                    Copy
+                  </Button>
+                </div>
+
+                {/* Option 2: Download Edit Decision List JSON */}
+                <div className="sculpt-well-sm flex items-center justify-between p-3.5 gap-3">
+                  <div className="flex items-center gap-3">
+                    <span className="grid h-9 w-9 place-items-center rounded-xl bg-[#0e6f64]/10 text-[#0e6f64]">
+                      <IconDownload size={16} />
+                    </span>
+                    <div>
+                      <div className="text-[13px] font-bold text-[#151922]">
+                        Edit Decision List (.json)
+                      </div>
+                      <div className="text-[11.5px] text-[#606d81]">
+                        Download complete cut timestamps & rationale data
+                      </div>
+                    </div>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    icon={<IconDownload size={12} />}
+                    onClick={handleDownloadEDL}
+                  >
+                    Download
+                  </Button>
+                </div>
+
+                {/* Status Notice */}
+                <div className="rounded-[12px] bg-black/5 p-3 text-[11.5px] leading-relaxed text-[#606d81]">
+                  <strong className="text-[#151922]">Direct MP4 Video Rendering: </strong>
+                  The local GPU-accelerated video rendering engine is in development for native macOS.
+                  Use the CapCut EditPilot prompt or EDL JSON above to assemble footage in CapCut desktop or mobile.
+                </div>
+              </div>
+
+              <div className="mt-2 flex justify-end">
+                <Button variant="ghost" size="md" onClick={() => setExportModalOpen(false)}>
+                  Close
                 </Button>
               </div>
-            ) : (
-              <div className="flex flex-col gap-4.5">
-                <div className="flex items-center justify-between border-b border-[#c6ccd8]/50 pb-2.5">
-                  <h3 className="text-[17.5px] font-bold text-[#151922] tracking-tight">
-                    {t("exportTitle")}
-                  </h3>
-                  <Pill tone="mint">Local Handoff</Pill>
-                </div>
-
-                <div className="grid grid-cols-3 gap-2.5">
-                  {[
-                    { id: "video", label: t("exportOptionVideo"), sub: t("exportOptionVideoDesc") },
-                    { id: "prompt", label: t("exportOptionPrompt"), sub: t("exportOptionPromptDesc") },
-                    { id: "both", label: t("exportOptionBoth"), sub: t("exportOptionBothDesc") },
-                  ].map((opt) => (
-                    <button
-                      key={opt.id}
-                      type="button"
-                      onClick={() => setExportOption(opt.id as any)}
-                      className={cn(
-                        "flex flex-col items-center gap-1 rounded-[16px] p-3 text-center transition-all",
-                        exportOption === opt.id
-                          ? "sculpt-well border border-[#3559cb]/30 text-[#3559cb]"
-                          : "sculpt-btn-raised"
-                      )}
-                    >
-                      <span className="text-[13px] font-bold text-[#151922]">{opt.label}</span>
-                      <span className="text-[10.5px] text-[#788296] leading-tight">{opt.sub}</span>
-                    </button>
-                  ))}
-                </div>
-
-                <div className="mt-1.5 flex justify-end gap-2.5">
-                  <Button variant="ghost" size="md" onClick={() => setExportModalOpen(false)}>
-                    {t("cancelBtn")}
-                  </Button>
-                  <Button
-                    variant="primary"
-                    size="md"
-                    disabled={exportPhase === "busy"}
-                    onClick={startExportSimulation}
-                  >
-                    {exportPhase === "busy" ? "Preparing..." : t("exportAction")}
-                  </Button>
-                </div>
-              </div>
-            )}
+            </div>
           </Card>
         </Modal>
       )}

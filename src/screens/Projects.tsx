@@ -91,7 +91,7 @@ export function Projects() {
                   <div className="truncate text-[14.5px] font-bold text-[#151922] tracking-tight">
                     {p.name}
                   </div>
-                  <div className="mt-0.5 text-[11.5px] text-[#788296] font-mono">
+                  <div className="mt-0.5 text-[11.5px] text-[#606d81] font-mono">
                     {p.meta} • {p.duration}
                   </div>
                 </div>
@@ -130,7 +130,7 @@ export function Projects() {
         <button
           type="button"
           onClick={() => go("home")}
-          className="sculpt-well flex min-h-[200px] flex-col items-center justify-center gap-2.5 p-5 text-center text-[#788296] hover:text-[#3559cb] transition-colors"
+          className="sculpt-well flex min-h-[200px] flex-col items-center justify-center gap-2.5 p-5 text-center text-[#606d81] hover:text-[#3559cb] transition-colors"
         >
           <span className="sculpt-btn-raised grid h-12 w-12 place-items-center rounded-full text-[#3559cb]">
             <IconPlus size={22} />
@@ -139,7 +139,7 @@ export function Projects() {
             <span className="block text-[14px] font-bold text-[#151922]">
               {t("projNewBtn")}
             </span>
-            <span className="text-[11.5px] text-[#788296]">Drop raw footage to begin</span>
+            <span className="text-[11.5px] text-[#606d81]">Drop raw footage to begin</span>
           </div>
         </button>
       </div>

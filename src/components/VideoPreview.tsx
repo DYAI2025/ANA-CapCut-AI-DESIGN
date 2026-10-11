@@ -92,16 +92,40 @@ export function VideoPreview({
 
   const pct = Math.min(100, Math.max(0, (currentTime / duration) * 100));
 
+  const seekToTime = (timeInSec: number) => {
+    const safeTime = Math.max(0, Math.min(duration, timeInSec));
+    setCurrentTime(safeTime);
+    if (videoRef.current && !videoError) {
+      videoRef.current.currentTime = safeTime;
+    }
+    onTimeChange?.(safeTime);
+  };
+
   const handleSeek = (clientX: number, target: HTMLDivElement) => {
     const rect = target.getBoundingClientRect();
     const width = Math.max(1, rect.width);
     const ratioPos = Math.max(0, Math.min(1, (clientX - rect.left) / width));
     const newTime = Math.round(ratioPos * duration);
-    setCurrentTime(newTime);
-    if (videoRef.current && !videoError) {
-      videoRef.current.currentTime = newTime;
+    seekToTime(newTime);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      seekToTime(currentTime - (e.shiftKey ? 10 : 2));
+    } else if (e.key === "ArrowRight") {
+      e.preventDefault();
+      seekToTime(currentTime + (e.shiftKey ? 10 : 2));
+    } else if (e.key === "Home") {
+      e.preventDefault();
+      seekToTime(0);
+    } else if (e.key === "End") {
+      e.preventDefault();
+      seekToTime(duration);
+    } else if (e.key === " " || e.key === "Enter") {
+      e.preventDefault();
+      togglePlay();
     }
-    onTimeChange?.(newTime);
   };
 
   const hasSafeVideoUrl = !!(asset?.objectUrl && isSafeMediaUrl(asset.objectUrl));
@@ -191,7 +215,8 @@ export function VideoPreview({
           aria-valuenow={Math.round(currentTime)}
           tabIndex={0}
           onClick={(e) => handleSeek(e.clientX, e.currentTarget)}
-          className="relative h-2.5 w-full cursor-pointer rounded-full bg-white/25"
+          onKeyDown={handleKeyDown}
+          className="relative h-2.5 w-full cursor-pointer rounded-full bg-white/25 focus:outline-none focus:ring-2 focus:ring-[#3559cb]/60"
         >
           {/* Progress fill */}
           <div
@@ -203,19 +228,33 @@ export function VideoPreview({
           {markers.map((m) => {
             const markerPct = Math.min(100, Math.max(0, (m.timestamp / duration) * 100));
             return (
-              <span
+              <button
                 key={m.id}
+                type="button"
+                role="button"
+                aria-label={`Evidence: ${m.label} at ${fmtTime(m.timestamp)}`}
                 title={`${m.label} (${fmtTime(m.timestamp)})`}
-                className="absolute top-1/2 h-3.5 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#ffea79] shadow-[0_0_6px_rgba(255,234,121,0.9)] hover:scale-125"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  seekToTime(m.timestamp);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    seekToTime(m.timestamp);
+                  }
+                }}
+                className="absolute top-1/2 h-3.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#ffea79] shadow-[0_0_6px_rgba(255,234,121,0.9)] hover:scale-125 focus:scale-125 focus:outline-none"
                 style={{ left: `${markerPct}%` }}
               />
             );
           })}
 
-          {/* Thumb */}
+          {/* Dedicated Sculpted Thumb Knob */}
           <span
-            className="neu-raised-xs absolute top-1/2 h-4 w-4 -translate-y-1/2 rounded-full bg-white shadow-[0_2px_6px_rgba(0,0,0,0.5)]"
-            style={{ left: `calc(${pct}% - 8px)` }}
+            className="sculpt-thumb-knob absolute top-1/2 -translate-y-1/2 -translate-x-1/2"
+            style={{ left: `${pct}%` }}
           />
         </div>
       </div>

@@ -122,7 +122,7 @@ export function BottomNav() {
             aria-label={label}
             className={cn(
               "flex h-12 flex-1 flex-col items-center justify-center gap-0.5 rounded-[14px] text-[9.5px] font-bold transition-all duration-150 select-none",
-              active ? "sculpt-well text-[#3559cb]" : "text-[#788296]"
+              active ? "sculpt-well text-[#3559cb]" : "text-[#606d81]"
             )}
           >
             <IconComponent size={18} />

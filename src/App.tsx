@@ -2,7 +2,7 @@ import { Component, useEffect, type ErrorInfo, type ReactNode } from "react";
 import { AppProvider, useApp } from "./lib/store";
 import { TopBar } from "./components/TopBar";
 import { FlowTrail } from "./components/FlowTrail";
-import { Sidebar, BottomNav } from "./components/Shell";
+import { BottomNav } from "./components/Shell";
 import { Toast } from "./components/Toast";
 import { PrototypePanel } from "./components/PrototypePanel";
 import { IconAlert, IconLock, IconRefresh } from "./lib/icons";
@@ -134,9 +134,8 @@ function MainLayout() {
       <FlowTrail />
 
       {/* Main Workspace Frame */}
-      <div className="mx-auto flex w-full max-w-[1440px] flex-1 gap-5 px-3 py-2 lg:gap-7 lg:px-6">
-        <Sidebar />
-        <main className="screen-in min-w-0 flex-1 pb-24 lg:pb-16">
+      <div className="mx-auto flex w-full max-w-[1400px] flex-1 px-4 py-2 lg:px-8">
+        <main className="screen-in min-w-0 w-full pb-24 lg:pb-16">
           <ScreenRouter />
         </main>
       </div>

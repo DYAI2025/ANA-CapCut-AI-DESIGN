@@ -80,7 +80,7 @@ export function Decision() {
       <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:gap-7 items-start">
         {/* Left: Competing Candidate Moments */}
         <Card className="flex flex-col gap-3.5 p-5">
-          <div className="text-[11px] font-bold uppercase tracking-wider text-[#788296] text-center">
+          <div className="text-[11px] font-bold uppercase tracking-wider text-[#606d81] text-center">
             Competing Candidate Moments
           </div>
           <div className="grid grid-cols-2 gap-3.5">
@@ -100,7 +100,7 @@ export function Decision() {
               </figure>
             ))}
           </div>
-          <div className="sculpt-well-sm p-3 text-center text-[11.5px] leading-relaxed text-[#788296]">
+          <div className="sculpt-well-sm p-3 text-center text-[12px] leading-relaxed text-[#606d81]">
             Selecting an option refines duration rather than blindly chopping important context.
           </div>
         </Card>
@@ -151,7 +151,7 @@ export function Decision() {
         <button
           type="button"
           onClick={() => go("result")}
-          className="mt-1 text-[12px] font-semibold text-[#788296] hover:text-[#151922]"
+          className="mt-1 text-[12px] font-semibold text-[#606d81] hover:text-[#151922]"
         >
           {t("decBackBtn")}
         </button>

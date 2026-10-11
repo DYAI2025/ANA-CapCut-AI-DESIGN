@@ -129,7 +129,7 @@ export function PrototypePanel() {
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="grid h-6 w-6 place-items-center rounded-lg text-[#788296] hover:text-[#151922]"
+              className="grid h-6 w-6 place-items-center rounded-lg text-[#606d81] hover:text-[#151922]"
             >
               <IconClose size={13} />
             </button>
@@ -157,7 +157,7 @@ export function PrototypePanel() {
                     "grid h-4.5 w-6 place-items-center rounded-[5px] text-[9.5px] font-bold font-mono shrink-0",
                     item.active
                       ? "bg-[#3559cb] text-white"
-                      : "bg-black/5 text-[#788296]"
+                      : "bg-black/5 text-[#606d81]"
                   )}
                 >
                   {item.code}
@@ -195,7 +195,7 @@ export function PrototypePanel() {
                 }}
                 className={cn(
                   "rounded-md px-1.5 py-0.5 text-[10px] font-bold",
-                  calmMotion ? "bg-[#3559cb]/15 text-[#3559cb]" : "bg-black/5 text-[#788296]"
+                  calmMotion ? "bg-[#3559cb]/15 text-[#3559cb]" : "bg-black/5 text-[#606d81]"
                 )}
               >
                 {calmMotion ? "Active" : "Normal"}

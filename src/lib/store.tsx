@@ -235,16 +235,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
       // Clipboard write failed or blocked by iframe permissions
     }
 
-    // Secure fallback: safe programmatic selection without execCommand
-    try {
-      if (typeof window !== "undefined" && window.isSecureContext) {
-        showToast(translate(lang, successKey));
-        return true;
-      }
-    } catch {
-      // Ignored
-    }
-
     showToast(translate(lang, "copyFailedToast"));
     return false;
   }, [lang, showToast]);

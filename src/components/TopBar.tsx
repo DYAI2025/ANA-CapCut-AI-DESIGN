@@ -1,4 +1,4 @@
-import { useApp } from "../lib/store";
+import { useApp, type Screen } from "../lib/store";
 import { LANG_OPTIONS } from "../lib/i18n";
 import { IconGlobe, IconLock, IconSpark, IconWave } from "../lib/icons";
 import { Button, Logo, Pill, Tooltip } from "./ui";
@@ -9,110 +9,104 @@ export function TopBar() {
     t,
     lang,
     setLang,
-    mode,
-    setMode,
     screen,
     go,
-    engineOnline,
     source,
+    triggerBlock,
     loadSample,
   } = useApp();
 
+  const navLinks: { id: Screen; label: string; requiresSource?: boolean }[] = [
+    { id: "home", label: t("navHome") },
+    { id: "understanding", label: t("navUnderstanding"), requiresSource: true },
+    { id: "result", label: t("navResult"), requiresSource: true },
+    { id: "projects", label: t("navProjects") },
+    { id: "settings", label: t("navSettings") },
+  ];
+
+  const handleNav = (item: { id: Screen; requiresSource?: boolean }) => {
+    if (item.requiresSource && !source) {
+      triggerBlock("nofile");
+      return;
+    }
+    go(item.id);
+  };
+
   return (
-    <header className="sticky top-0 z-40 bg-[#eef1f6]/90 px-4 pt-3 pb-3 backdrop-blur-md lg:px-6">
-      <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between gap-3">
-        {/* Brand identity */}
-        <div className="flex items-center gap-3">
+    <header className="sticky top-0 z-40 bg-[#eef1f6]/92 px-4 py-3 backdrop-blur-md border-b border-white/60 lg:px-8">
+      <div className="mx-auto flex w-full max-w-[1400px] items-center justify-between gap-6">
+        {/* Zone 1: Brand Wordmark */}
+        <div className="flex items-center gap-3 shrink-0">
           <button
             type="button"
             onClick={() => go("home")}
-            className="group flex items-center gap-2.5 text-left select-none"
+            className="group flex items-center gap-2.5 text-left select-none focus:outline-none"
+            aria-label="Destill Home"
           >
-            <Logo size={40} />
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-[18.5px] font-bold tracking-tight text-[#151922]">
-                  {t("brandName")}
-                </span>
-                <span className="rounded-md bg-[#3559cb]/10 px-1.5 py-0.5 text-[10px] font-bold text-[#3559cb]">
-                  v0.2
-                </span>
-              </div>
-              <span className="hidden text-[11px] font-medium tracking-tight text-[#788296] sm:block">
-                {t("brandKicker")}
+            <Logo size={36} />
+            <div className="flex items-baseline gap-2">
+              <span className="text-[19px] font-bold tracking-tight text-[#151922]">
+                {t("brandName")}
+              </span>
+              <span className="text-[11px] font-semibold text-[#606d81] tracking-tight hidden sm:inline">
+                Design Reference R1
               </span>
             </div>
           </button>
         </div>
 
-        {/* Product Mode Switcher: Analyze (First capability) vs Destill (Future editing) */}
-        <div
-          role="group"
-          aria-label="Product Capability Mode"
-          className="sculpt-well-sm hidden items-center gap-1 p-1 sm:flex"
+        {/* Zone 2: Integrated Navigation Links (Single-Line Controls) */}
+        <nav
+          aria-label="Primary Navigation"
+          className="hidden md:flex items-center gap-1.5 sculpt-well-sm p-1"
         >
-          <Tooltip label={t("modeAnalyzeDesc")} side="bottom">
-            <button
-              type="button"
-              onClick={() => {
-                setMode("analyze");
-                if (screen === "result") go("understanding");
-              }}
-              className={cn(
-                "flex h-7.5 items-center gap-1.5 rounded-[10px] px-3 text-[12px] font-semibold transition-all duration-150",
-                mode === "analyze"
-                  ? "sculpt-btn-raised text-[#3559cb]"
-                  : "text-[#788296] hover:text-[#151922]"
-              )}
+          {navLinks.map((item) => {
+            const active =
+              screen === item.id ||
+              (item.id === "understanding" && screen === "understanding") ||
+              (item.id === "result" && (screen === "result" || screen === "decision"));
+
+            return (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => handleNav(item)}
+                aria-current={active ? "page" : undefined}
+                className={cn(
+                  "h-7.5 px-3.5 text-[12.5px] font-semibold rounded-[10px] whitespace-nowrap transition-all duration-150 select-none",
+                  active
+                    ? "sculpt-btn-raised text-[#151922] shadow-sm"
+                    : "text-[#606d81] hover:text-[#151922]"
+                )}
+              >
+                {item.label}
+              </button>
+            );
+          })}
+        </nav>
+
+        {/* Zone 3: Essential Utilities & Creator Context */}
+        <div className="flex items-center gap-3 shrink-0">
+          {/* Quick Demo Sample Action if empty */}
+          {!source && (
+            <Button
+              size="sm"
+              variant="utility"
+              tip={t("sampleVideoTip")}
+              onClick={loadSample}
+              className="hidden lg:inline-flex"
             >
-              <IconWave size={13} />
-              {t("modeAnalyze")}
-            </button>
-          </Tooltip>
+              {t("sampleVideoBtn")}
+            </Button>
+          )}
 
-          <Tooltip label={t("modeDestillDesc")} side="bottom">
-            <button
-              type="button"
-              onClick={() => {
-                setMode("destill");
-                if (screen === "understanding") go("result");
-              }}
-              className={cn(
-                "flex h-7.5 items-center gap-1.5 rounded-[10px] px-3 text-[12px] font-semibold transition-all duration-150",
-                mode === "destill"
-                  ? "sculpt-btn-raised text-[#151922]"
-                  : "text-[#788296] hover:text-[#151922]"
-              )}
-            >
-              <IconSpark size={13} />
-              {t("modeDestill")}
-            </button>
-          </Tooltip>
-        </div>
-
-        {/* System & Localization Utilities */}
-        <div className="flex items-center gap-2">
-          {/* Privacy Guarantee */}
-          <Tooltip label={t("localGuaranteeTooltip")} side="bottom">
-            <Pill tone="mint" icon={<IconLock size={12} />} className="hidden md:inline-flex">
-              {t("localGuarantee")}
-            </Pill>
-          </Tooltip>
-
-          {/* Engine Status */}
-          <Tooltip label={engineOnline ? t("engineReady") : t("enginePaused")} side="bottom">
-            <Pill tone={engineOnline ? "mint" : "amber"} dot className="hidden lg:inline-flex">
-              {engineOnline ? "Engine Online" : "Engine Paused"}
-            </Pill>
-          </Tooltip>
-
-          {/* Language Switch */}
+          {/* Language Switcher */}
           <div
             role="group"
-            aria-label="Select Language"
+            aria-label="Language"
             className="sculpt-well-sm flex items-center p-0.5"
           >
-            <span className="hidden px-1.5 text-[#788296] sm:inline">
+            <span className="hidden px-1.5 text-[#606d81] sm:inline">
               <IconGlobe size={13} />
             </span>
             {LANG_OPTIONS.map((l) => (
@@ -125,7 +119,7 @@ export function TopBar() {
                   "h-6.5 rounded-[9px] px-2 text-[11px] font-bold uppercase tracking-wider transition-all duration-150",
                   lang === l.id
                     ? "sculpt-btn-raised text-[#151922]"
-                    : "text-[#788296] hover:text-[#4d5566]"
+                    : "text-[#606d81] hover:text-[#151922]"
                 )}
               >
                 {l.label}
@@ -133,18 +127,12 @@ export function TopBar() {
             ))}
           </div>
 
-          {/* Quick Demo Sample Action if empty */}
-          {!source && (
-            <Button
-              size="sm"
-              variant="utility"
-              tip={t("sampleVideoTip")}
-              onClick={loadSample}
-              className="hidden sm:inline-flex"
-            >
-              {t("sampleVideoBtn")}
-            </Button>
-          )}
+          {/* Ana Creator Context Avatar */}
+          <Tooltip label="Creator: Ana (iPhone CapCut Workflow)" side="bottom">
+            <div className="sculpt-btn-raised grid h-8 w-8 place-items-center rounded-full text-[12px] font-bold text-[#151922] cursor-pointer">
+              A
+            </div>
+          </Tooltip>
         </div>
       </div>
     </header>

@@ -100,7 +100,7 @@ export function Style() {
 
         {/* Right: Rhythmic & Assembly Parameters Card */}
         <Card className="flex flex-col p-5.5 sm:px-7 sm:py-5">
-          <div className="text-[11.5px] font-bold uppercase tracking-wider text-[#788296] pb-2 border-b border-[#c6ccd8]/50">
+          <div className="text-[11.5px] font-bold uppercase tracking-wider text-[#606d81] pb-2 border-b border-[#c6ccd8]/50">
             Assembly Rules
           </div>
 
@@ -160,7 +160,7 @@ export function Style() {
                   value={styleConfig.pace}
                   onChange={(v) => setStyleConfig({ pace: v })}
                 />
-                <div className="mt-1 flex justify-between text-[10.5px] font-mono text-[#788296]">
+                <div className="mt-1 flex justify-between text-[10.5px] font-mono text-[#606d81]">
                   <span>Breathing (Calm)</span>
                   <span>Rapid Hook (Punchy)</span>
                 </div>

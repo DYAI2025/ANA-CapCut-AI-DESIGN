@@ -131,9 +131,9 @@ export function Settings() {
         </Card>
 
         {/* Prototype Version Notice */}
-        <div className="sculpt-well-sm p-4 text-center text-[11.5px] leading-relaxed text-[#788296]">
+        <div className="sculpt-well-sm p-4 text-center text-[12px] leading-relaxed text-[#606d81]">
           <strong className="text-[#151922] block mb-0.5">
-            DESTILL — Sculpted Light / Premium Product UI v0.2
+            DESTILL — Design Reference R1 (Sculpted Light UI)
           </strong>
           Designed for creator Ana. Built in single end-to-end execution. Zero billable external API spending.
         </div>

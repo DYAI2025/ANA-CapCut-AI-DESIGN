@@ -147,7 +147,7 @@ export function Blocked() {
             </div>
           )}
           <div className="flex justify-between border-t border-[#c6ccd8]/50 pt-1 text-[11px]">
-            <span className="text-[#788296]">Engine Distinction:</span>
+            <span className="text-[#606d81]">Engine Distinction:</span>
             <span className="text-[#0e6f64]">Browser playback limit ≠ FFmpeg offline limit</span>
           </div>
         </div>

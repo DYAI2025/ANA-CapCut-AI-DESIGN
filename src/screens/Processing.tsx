@@ -34,7 +34,7 @@ export function Processing() {
         {/* State Tag & Source File Context */}
         <div className="mb-7 flex flex-wrap items-center justify-center gap-2">
           <Pill tone="accent" dot>
-            {t("engineDemoBadge")}
+            DEMO SIMULATION
           </Pill>
           <span className="sculpt-well-sm inline-flex h-7 items-center gap-2 px-3 text-[11.5px] font-semibold text-[#151922]">
             <span className="truncate max-w-[170px]">{source?.name ?? "Source Video"}</span>
@@ -50,7 +50,7 @@ export function Processing() {
             <div className="flex flex-col items-center">
               <span className="text-[40px] font-bold leading-none tabular-nums font-mono tracking-tight text-[#151922]">
                 {Math.floor(procProgress)}
-                <span className="text-[18px] font-semibold text-[#788296]">%</span>
+                <span className="text-[18px] font-semibold text-[#606d81]">%</span>
               </span>
               <span className="mt-2 flex items-center gap-1.5 text-[12px] font-semibold text-[#3559cb]">
                 <IconWave size={13} className="animate-pulse" />
@@ -80,7 +80,7 @@ export function Processing() {
                 aria-current={isActive ? "step" : undefined}
                 className={cn(
                   "flex flex-col items-center gap-1 rounded-[14px] py-2.5 transition-all duration-200",
-                  isActive ? "sculpt-btn-raised text-[#151922]" : isDone ? "text-[#151922]" : "text-[#788296]/50"
+                  isActive ? "sculpt-btn-raised text-[#151922]" : isDone ? "text-[#151922]" : "text-[#606d81]/60"
                 )}
               >
                 <span
@@ -90,7 +90,7 @@ export function Processing() {
                       ? "bg-[#0e6f64]/15 text-[#0e6f64]"
                       : isActive
                       ? "bg-[#3559cb]/15 text-[#3559cb]"
-                      : "sculpt-well-sm text-[#788296]"
+                      : "sculpt-well-sm text-[#606d81]"
                   )}
                 >
                   {isDone ? <IconCheck size={12} /> : idx + 1}
@@ -114,7 +114,7 @@ export function Processing() {
             {t("cancelBtn")}
           </Button>
 
-          <p className="flex items-center gap-1 text-[11.5px] font-medium text-[#788296]">
+          <p className="flex items-center gap-1 text-[11.5px] font-medium text-[#606d81]">
             <IconLock size={12} />
             {t("procLocalNote")}
           </p>
