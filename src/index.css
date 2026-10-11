@@ -284,20 +284,34 @@
   border: 1px solid rgba(255, 255, 255, 0.70);
 }
 
-/* Segmented Control Track & Selected Segment */
+/* Segmented Control Track & Selected Segment (Sculpted Light System) */
 .sculpt-seg-track {
+  position: relative;
   background: linear-gradient(150deg, var(--surface-low) 0%, #f4f6fa 100%);
-  box-shadow: var(--shadow-inset-small);
+  box-shadow:
+    inset 2px 2px 5px rgba(154, 168, 188, 0.38),
+    inset -2px -2px 5px rgba(255, 255, 255, 0.92);
   border-radius: var(--radius-control);
-  border: 1px solid rgba(255, 255, 255, 0.70);
+  border: 1px solid rgba(255, 255, 255, 0.75);
   padding: 4px;
 }
 
 .sculpt-seg-thumb {
-  background: linear-gradient(150deg, #ffffff 0%, var(--surface) 100%);
-  box-shadow: var(--shadow-raised-small);
+  background: linear-gradient(150deg, #ffffff 0%, var(--surface-lift) 100%);
+  box-shadow:
+    3px 4px 9px rgba(154, 168, 188, 0.28),
+    -3px -3px 9px rgba(255, 255, 255, 0.95),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
   border-radius: calc(var(--radius-control) - 4px);
-  border: 1px solid rgba(255, 255, 255, 0.90);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+}
+
+.sculpt-seg-thumb:active {
+  box-shadow:
+    1px 2px 5px rgba(154, 168, 188, 0.25),
+    -1px -1px 5px rgba(255, 255, 255, 0.90),
+    inset 0 1px 0 rgba(255, 255, 255, 0.70);
 }
 
 /* Input Well */

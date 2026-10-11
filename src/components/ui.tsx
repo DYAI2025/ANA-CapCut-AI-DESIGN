@@ -280,15 +280,29 @@ export function Segmented<T extends string>({
     options.findIndex((o) => o.value === value)
   );
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+      e.preventDefault();
+      const nextIdx = (idx + 1) % n;
+      onChange(options[nextIdx].value);
+    } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+      e.preventDefault();
+      const prevIdx = (idx - 1 + n) % n;
+      onChange(options[prevIdx].value);
+    }
+  };
+
   return (
     <div
       role="radiogroup"
-      className={cn("sculpt-seg-track relative grid", className)}
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
+      className={cn("sculpt-seg-track relative grid focus:outline-none focus-visible:ring-2 focus-visible:ring-[#3559cb]/30", className)}
       style={{ gridTemplateColumns: `repeat(${n}, minmax(0, 1fr))` }}
     >
       <span
         aria-hidden
-        className="sculpt-seg-thumb absolute bottom-1 left-1 top-1 transition-transform duration-250 ease-[cubic-bezier(.25,1.2,.4,1)]"
+        className="sculpt-seg-thumb pointer-events-none absolute bottom-1 left-1 top-1 transition-transform duration-250 ease-[cubic-bezier(.25,1.2,.4,1)]"
         style={{ width: `calc((100% - 8px) / ${n})`, transform: `translateX(${idx * 100}%)` }}
       />
       {options.map((o) => {
