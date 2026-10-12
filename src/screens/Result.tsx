@@ -1,7 +1,7 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useApp } from "../lib/store";
 import { ScreenHead } from "../components/ScreenHead";
-import { PhoneFrame, Scene } from "../components/Scene";
+import { PhoneFrame, Scene, type SceneKind } from "../components/Scene";
 import { Button, Card, Modal, Pill } from "../components/ui";
 import {
   IconArrowLeft,
@@ -18,7 +18,7 @@ import {
   IconTrash,
   IconWand,
 } from "../lib/icons";
-import { SYNTHETIC_EDIT_PLAN } from "../services/engineAdapter";
+import { getEditPlanForDecision } from "../services/engineAdapter";
 import { fmtTime } from "../utils/formatters";
 import { cn } from "../utils/cn";
 
@@ -33,12 +33,47 @@ export function Result() {
     setKeptCut,
     showToast,
     copyText,
+    editPlan,
+    decisionChoice,
   } = useApp();
 
-  const plan = SYNTHETIC_EDIT_PLAN;
+  const plan = editPlan ?? getEditPlanForDecision(decisionChoice, source?.name);
   const [playing, setPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [exportModalOpen, setExportModalOpen] = useState(false);
+
+  // Smooth playback loop
+  useEffect(() => {
+    if (!playing) return;
+    const interval = window.setInterval(() => {
+      setCurrentTime((prev) => {
+        const next = Math.round((prev + 0.1) * 10) / 10;
+        if (next >= plan.actualDurationSeconds) {
+          return 0; // loop seamlessly
+        }
+        return next;
+      });
+    }, 100);
+    return () => window.clearInterval(interval);
+  }, [playing, plan.actualDurationSeconds]);
+
+  // Synchronized active segment
+  const activeSegmentIndex = useMemo(() => {
+    const idx = plan.segments.findIndex(
+      (s) => currentTime >= s.cutStart && currentTime <= s.cutEnd
+    );
+    return idx >= 0 ? idx : 0;
+  }, [plan.segments, currentTime]);
+
+  const activeSegment = plan.segments[activeSegmentIndex] || plan.segments[0];
+
+  const activeSceneKind: SceneKind = useMemo(() => {
+    const title = (activeSegment.title || "").toLowerCase();
+    if (title.includes("market") || title.includes("climax")) return "market";
+    if (title.includes("transit") || title.includes("tram") || title.includes("b-roll")) return "city";
+    if (title.includes("sunset") || title.includes("pier") || title.includes("outro")) return "coast";
+    return "dawn";
+  }, [activeSegment]);
 
   const promptText = useMemo(() => {
     return plan.capCutEditPilotPrompt;
@@ -123,10 +158,17 @@ export function Result() {
         <div className="flex items-center gap-2">
           <IconInfo size={15} className="text-[#3559cb] shrink-0" />
           <strong className="text-[#151922]">DEMO CANDIDATE PREVIEW — MP4 NOT RENDERED: </strong>
-          <span>Showing proposed short cut structure and CapCut EditPilot prompt. Local rendering pipeline pending.</span>
+          <span>
+            {source?.isSyntheticSample
+              ? "Showing proposed short cut structure and CapCut EditPilot prompt for Lisbon raw footage."
+              : `Showing proposed cut structure and CapCut prompt for custom source "${source?.name ?? "media"}".`}
+          </span>
         </div>
         <div className="flex items-center gap-2">
           <Pill tone="mint">Planned Target: {fmtTime(plan.actualDurationSeconds)}</Pill>
+          <span className="font-mono text-[11px] text-[#606d81] uppercase font-semibold">
+            {decisionChoice.toUpperCase()} CUT
+          </span>
         </div>
       </div>
 
@@ -137,21 +179,32 @@ export function Result() {
           <Card className="flex flex-col items-center gap-4 p-5">
             <PhoneFrame className="w-full max-w-[270px]">
               <div className="relative h-full w-full">
-                <Scene kind="dawn" aspect="9/16" />
+                <Scene kind={activeSceneKind} aspect="9/16" />
 
-                {/* Subtitle simulation with clean typography */}
-                <div className="absolute inset-x-3 bottom-14 rounded-[12px] bg-black/85 px-3 py-1.5 text-center text-[12px] font-bold text-white tracking-wide backdrop-blur-md">
-                  "If you need 40 seconds to explain it, you lost the feed."
+                {/* Active Segment Tag */}
+                <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-black/70 px-2.5 py-1 text-[11px] font-semibold text-white shadow-sm backdrop-blur-md">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#10b981] animate-pulse" />
+                  <span className="truncate max-w-[170px]">
+                    Take {activeSegmentIndex + 1}/{plan.segments.length}: {activeSegment.title}
+                  </span>
                 </div>
 
-                {/* Play Button */}
+                {/* Subtitle simulation with clean typography */}
+                <div className="absolute inset-x-3 bottom-14 rounded-[12px] bg-black/85 px-3 py-2 text-center text-[12px] font-bold text-white tracking-wide backdrop-blur-md leading-snug">
+                  "{activeSegment.title}"
+                  <span className="block mt-0.5 text-[10.5px] font-normal text-white/80">
+                    {activeSegment.rationale.slice(0, 56)}...
+                  </span>
+                </div>
+
+                {/* Play Button Overlay */}
                 {!playing && (
                   <div className="absolute inset-0 grid place-items-center">
                     <button
                       type="button"
                       onClick={() => setPlaying(true)}
                       aria-label="Play candidate cut"
-                      className="grid h-13 w-13 place-items-center rounded-full bg-white/85 text-[#3559cb] shadow-[0_6px_20px_rgba(21,25,34,0.35)] backdrop-blur-md"
+                      className="grid h-13 w-13 place-items-center rounded-full bg-white/90 text-[#3559cb] shadow-[0_6px_20px_rgba(21,25,34,0.35)] backdrop-blur-md transition-transform hover:scale-105 active:scale-95"
                     >
                       <IconPlay size={20} className="ml-0.5" />
                     </button>
@@ -160,23 +213,49 @@ export function Result() {
               </div>
             </PhoneFrame>
 
-            {/* Playback Scrubber */}
+            {/* Playback Scrubber with Delicate Sculpted Radial Knob */}
             <div className="flex w-full items-center gap-2.5 px-1">
               <button
                 type="button"
                 onClick={() => setPlaying(!playing)}
-                className="sculpt-btn-raised grid h-7 w-7 place-items-center rounded-full text-[#151922]"
+                className="sculpt-btn-raised grid h-8 w-8 place-items-center rounded-full text-[#151922] transition-transform active:scale-95 shrink-0"
+                aria-label={playing ? "Pause" : "Play"}
               >
-                {playing ? <IconPause size={12} /> : <IconPlay size={12} className="ml-0.5" />}
+                {playing ? <IconPause size={13} /> : <IconPlay size={13} className="ml-0.5" />}
               </button>
-              <div className="sculpt-well-sm relative h-2 flex-1 overflow-hidden p-0">
+
+              <div
+                role="slider"
+                aria-valuemin={0}
+                aria-valuemax={plan.actualDurationSeconds}
+                aria-valuenow={currentTime}
+                tabIndex={0}
+                onClick={(e) => {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  const pos = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+                  setCurrentTime(Math.round(pos * plan.actualDurationSeconds * 10) / 10);
+                }}
+                className="sculpt-well-sm relative h-3 flex-1 cursor-pointer overflow-visible p-0 rounded-full select-none"
+              >
+                {/* Progress fill */}
                 <div
-                  className="h-full bg-gradient-to-r from-[#6082ec] to-[#0e6f64]"
-                  style={{ width: `${(currentTime / plan.actualDurationSeconds) * 100}%` }}
+                  className="h-full rounded-full bg-gradient-to-r from-[#6082ec] via-[#3559cb] to-[#0e6f64] transition-[width] duration-75"
+                  style={{ width: `${Math.min(100, (currentTime / plan.actualDurationSeconds) * 100)}%` }}
+                />
+
+                {/* Sculpted Circular Timeline Knob with delicate radial specular highlight */}
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute top-1/2 -translate-y-1/2 -translate-x-1/2 h-4 w-4 rounded-full border border-white/90 shadow-[0_2px_6px_rgba(21,25,34,0.35),inset_0_1px_2px_rgba(255,255,255,1)]"
+                  style={{
+                    left: `${Math.min(100, (currentTime / plan.actualDurationSeconds) * 100)}%`,
+                    background: "radial-gradient(circle at 35% 35%, #ffffff 0%, #edf1f7 100%)",
+                  }}
                 />
               </div>
-              <span className="font-mono text-[10.5px] font-semibold text-[#606d81] tabular-nums">
-                {fmtTime(currentTime)} / {fmtTime(plan.actualDurationSeconds)}
+
+              <span className="font-mono text-[11px] font-semibold text-[#606d81] tabular-nums whitespace-nowrap shrink-0">
+                {fmtTime(Math.min(currentTime, plan.actualDurationSeconds))} / {fmtTime(plan.actualDurationSeconds)}
               </span>
             </div>
 
@@ -293,28 +372,49 @@ export function Result() {
 
             {/* Preserved Segments List */}
             <div>
-              <div className="text-[11.5px] font-bold uppercase tracking-wider text-[#606d81] mb-2">
-                Planned Assembly Segments (5 Takes)
+              <div className="text-[11.5px] font-bold uppercase tracking-wider text-[#606d81] mb-2 flex items-center justify-between">
+                <span>Planned Assembly Segments ({plan.segments.length} Takes)</span>
+                <span className="font-mono text-[11px] text-[#3559cb] font-semibold">Active: Take #{activeSegmentIndex + 1}</span>
               </div>
               <div className="space-y-1.5">
-                {plan.segments.map((seg, i) => (
-                  <div
-                    key={seg.id}
-                    className="sculpt-well-sm flex items-center justify-between gap-3 px-3.5 py-2.5 text-[12.5px]"
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <span className="grid h-5 w-5 place-items-center rounded-full bg-white text-[10.5px] font-bold text-[#3559cb] tabular-nums">
-                        {i + 1}
-                      </span>
-                      <span className="font-semibold text-[#151922]">{seg.title}</span>
+                {plan.segments.map((seg, i) => {
+                  const isCurrent = i === activeSegmentIndex;
+                  return (
+                    <div
+                      key={seg.id}
+                      onClick={() => {
+                        setCurrentTime(seg.cutStart);
+                        setPlaying(true);
+                      }}
+                      className={cn(
+                        "sculpt-well-sm flex items-center justify-between gap-3 px-3.5 py-2.5 text-[12.5px] cursor-pointer transition-all hover:bg-white/90",
+                        isCurrent && "border-[#3559cb] ring-2 ring-[#3559cb]/30 bg-white shadow-sm"
+                      )}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <span
+                          className={cn(
+                            "grid h-5 w-5 place-items-center rounded-full text-[10.5px] font-bold tabular-nums transition-colors",
+                            isCurrent ? "bg-[#3559cb] text-white" : "bg-white text-[#3559cb]"
+                          )}
+                        >
+                          {i + 1}
+                        </span>
+                        <div className="flex flex-col">
+                          <span className={cn("font-semibold text-[#151922]", isCurrent && "text-[#3559cb]")}>
+                            {seg.title}
+                          </span>
+                          <span className="text-[11px] text-[#606d81] line-clamp-1">{seg.rationale}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 font-mono text-[11.5px] text-[#606d81] tabular-nums shrink-0">
+                        <span>Source {fmtTime(seg.sourceStart)}–{fmtTime(seg.sourceEnd)}</span>
+                        <span>→</span>
+                        <span className="text-[#3559cb] font-bold">{fmtTime(seg.cutStart)}–{fmtTime(seg.cutEnd)}</span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2 font-mono text-[11.5px] text-[#606d81] tabular-nums">
-                      <span>Source {fmtTime(seg.sourceStart)}–{fmtTime(seg.sourceEnd)}</span>
-                      <span>→</span>
-                      <span className="text-[#3559cb] font-bold">{fmtTime(seg.cutStart)}–{fmtTime(seg.cutEnd)}</span>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </Card>

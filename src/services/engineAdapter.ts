@@ -284,88 +284,295 @@ export const SYNTHETIC_UNDERSTANDING_REPORT: VideoUnderstandingReport = {
 };
 
 /**
- * Deterministic Demo Fixture for Edit Plan Summary (Future Result Preview)
+ * Deterministic Demo Fixture Generator for Edit Plan Summary
+ * Dynamically tailored per editorial decision: Balanced (28.4s), Tighter (18.2s), Longer (38.6s), Focus (24.0s)
  */
-export const SYNTHETIC_EDIT_PLAN: EditPlanSummary = {
-  id: "plan-demo-001",
-  sourceAssetId: "asset-lisbon-raw",
-  targetDurationSeconds: 45,
-  actualDurationSeconds: 44,
-  platform: "tiktok",
-  preservedMomentsCount: 5,
-  removedMomentsCount: 18,
-  segments: [
-    {
-      id: "seg-1",
-      sourceStart: 18,
-      sourceEnd: 27,
-      cutStart: 0,
-      cutEnd: 9,
-      title: "Hook: The Feed Retention Trap",
-      rationale: "Selected for highest prosodic urgency and immediate attention capture.",
-      audioTreatment: "original",
-    },
-    {
-      id: "seg-2",
-      sourceStart: 215,
-      sourceEnd: 224,
-      cutStart: 9,
-      cutEnd: 18,
-      title: "Context: Street Transit B-Roll",
-      rationale: "Establishes location in 9 seconds without lingering on redundant pauses.",
-      audioTreatment: "ducked",
-    },
-    {
-      id: "seg-3",
-      sourceStart: 374,
-      sourceEnd: 388,
-      cutStart: 18,
-      cutEnd: 32,
-      title: "Core Thesis: Cutting The Sacred Montage",
-      rationale: "Delivers the central insight with high vocal authority.",
-      audioTreatment: "original",
-    },
-    {
-      id: "seg-4",
-      sourceStart: 420,
-      sourceEnd: 428,
-      cutStart: 32,
-      cutEnd: 40,
-      title: "The Formula: 1 Second Per Thought",
-      rationale: "Provides concise actionable creator instruction.",
-      audioTreatment: "original",
-    },
-    {
-      id: "seg-5",
-      sourceStart: 1022,
-      sourceEnd: 1026,
-      cutStart: 40,
-      cutEnd: 44,
-      title: "Outro: Sunset Pier Hold",
-      rationale: "Holds for 4 seconds allowing loop replay into the opening hook.",
-      audioTreatment: "original",
-    },
-  ],
-  editorialRationale: {
-    strongOpening: "Starts on the unscripted realization at 00:18 rather than the rehearsed studio intro.",
-    narrativeThread: "Every retained 9-second segment directly reinforces the single thesis of cutting filler.",
-    cleanCutsExplanation: "Removed 17 minutes 52 seconds of camera adjustments, tram compressor dips, and repeated takes.",
-  },
-  capCutEditPilotPrompt: `Destill EditPilot Handoff — Raw Footage to 45s Cut
+export function getEditPlanForDecision(
+  choice: "balanced" | "longer" | "tighter" | "focus" | "retry" = "balanced",
+  assetName = "Lisbon_trip_raw_0412.mov"
+): EditPlanSummary {
+  if (choice === "tighter") {
+    return {
+      id: "plan-tighter-001",
+      sourceAssetId: "asset-lisbon-raw",
+      targetDurationSeconds: 18,
+      actualDurationSeconds: 18.2,
+      platform: "tiktok",
+      preservedMomentsCount: 3,
+      removedMomentsCount: 22,
+      segments: [
+        {
+          id: "seg-t1",
+          sourceStart: 18,
+          sourceEnd: 24,
+          cutStart: 0,
+          cutEnd: 6.0,
+          title: "Hook: Feed Retention Trap",
+          rationale: "Confrontational direct address; all breathing pauses and pre-roll trimmed.",
+          audioTreatment: "original",
+        },
+        {
+          id: "seg-t2",
+          sourceStart: 374,
+          sourceEnd: 382,
+          cutStart: 6.0,
+          cutEnd: 14.0,
+          title: "Thesis: Cutting The Sacred Montage",
+          rationale: "Delivers the turning point insight with zero conversational filler.",
+          audioTreatment: "original",
+        },
+        {
+          id: "seg-t3",
+          sourceStart: 420,
+          sourceEnd: 424,
+          cutStart: 14.0,
+          cutEnd: 18.2,
+          title: "Punchline: 1 Second Per Thought",
+          rationale: "High-density creator rule formatted for instant replay loop.",
+          audioTreatment: "original",
+        },
+      ],
+      editorialRationale: {
+        strongOpening: "Direct cut to 00:18 realization with zero pre-roll. Viewer hooked in under 1.2s.",
+        narrativeThread: "High-velocity compression: The Trap → The Montage Sacrifice → The 1-Second Rule.",
+        cleanCutsExplanation: "Removed 18 minutes 18 seconds. All pauses clamped to 0.4s max; all transit B-roll pruned.",
+      },
+      capCutEditPilotPrompt: `Destill EditPilot Handoff — Ultra-Tight 18.2s High-Retention Cut
 Target Platform: TikTok (9:16 Vertical, 1080x1920)
-Pacing: Fast Hook, Deliberate Insight, 0.8s Max Pause Trim
+Editorial Strategy: TIGHTER (Maximum Pacing, Zero Buffer, Instant Retention)
 
-Step 1: Import Source "Lisbon_trip_raw_0412.mov" (No re-encoding)
+Step 1: Import Source "${assetName}" (No re-encoding)
+Step 2: Assemble 3 In/Out Ranges:
+   • 00:18 – 00:24 (Hook: Direct confrontational address, 6.0s)
+   • 06:14 – 06:22 (Thesis: Montage confession, 8.0s)
+   • 07:00 – 07:04 (Punchline: 1 second per thought, 4.2s)
+Step 3: Clamp all audio silences > 0.4s immediately.
+Step 4: Hard jump-cuts between takes; no transition dissolves.
+Step 5: Apply dynamic punch-in zoom (1.12x) on thesis delivery at 06:14.
+Step 6: Center-weighted high-contrast captions with black stroke. Rec.709 H.264 export.`,
+    };
+  }
+
+  if (choice === "longer") {
+    return {
+      id: "plan-longer-001",
+      sourceAssetId: "asset-lisbon-raw",
+      targetDurationSeconds: 39,
+      actualDurationSeconds: 38.6,
+      platform: "tiktok",
+      preservedMomentsCount: 5,
+      removedMomentsCount: 16,
+      segments: [
+        {
+          id: "seg-l1",
+          sourceStart: 18,
+          sourceEnd: 26,
+          cutStart: 0,
+          cutEnd: 8.0,
+          title: "Hook: Dawn Awakening & Address",
+          rationale: "Natural conversational inflection establishing emotional connection.",
+          audioTreatment: "original",
+        },
+        {
+          id: "seg-l2",
+          sourceStart: 215,
+          sourceEnd: 224,
+          cutStart: 8.0,
+          cutEnd: 17.0,
+          title: "Atmosphere: Tram 28 Street Transit",
+          rationale: "Full 9-second atmospheric transit giving viewer a visceral sense of place.",
+          audioTreatment: "ducked",
+        },
+        {
+          id: "seg-l3",
+          sourceStart: 374,
+          sourceEnd: 384,
+          cutStart: 17.0,
+          cutEnd: 27.0,
+          title: "Core Insight: Sacred Montage Confession",
+          rationale: "Full 10 seconds of emotional vulnerability with organic speech pauses.",
+          audioTreatment: "original",
+        },
+        {
+          id: "seg-l4",
+          sourceStart: 420,
+          sourceEnd: 427,
+          cutStart: 27.0,
+          cutEnd: 34.0,
+          title: "The Method: 1 Second Per Thought",
+          rationale: "Clear explanation allowing viewer to absorb creator methodology.",
+          audioTreatment: "original",
+        },
+        {
+          id: "seg-l5",
+          sourceStart: 1022,
+          sourceEnd: 1027,
+          cutStart: 34.0,
+          cutEnd: 38.6,
+          title: "Resolution: Sunset Pier Wind Hold",
+          rationale: "Cinematic cooldown shot with ambient river audio before loop replay.",
+          audioTreatment: "original",
+        },
+      ],
+      editorialRationale: {
+        strongOpening: "Maintains natural conversational pre-beat to establish authentic creator intimacy.",
+        narrativeThread: "Balances storytelling rhythm, acoustic cobblestone ambience, and actionable advice.",
+        cleanCutsExplanation: "Removed 17 minutes 57 seconds. Preserves musicality of street audio and natural breath.",
+      },
+      capCutEditPilotPrompt: `Destill EditPilot Handoff — Extended 38.6s Narrative Cut
+Target Platform: TikTok (9:16 Vertical, 1080x1920)
+Editorial Strategy: LONGER (Cinematic Texture, Ambient B-Roll, Narrative Breathing Room)
+
+Step 1: Import Source "${assetName}" (No re-encoding)
 Step 2: Assemble 5 In/Out Ranges:
-   • 00:18 – 00:27 (Hook: Direct address)
-   • 03:35 – 03:44 (B-Roll: Street transit, duck audio -6dB)
-   • 06:14 – 06:28 (Insight: The montage confession)
-   • 07:00 – 07:08 (Rule: 1 second per thought)
-   • 17:02 – 17:06 (Outro: Pier sunset, hold 0.6s before loop)
-Step 3: Trim all silences > 0.8s automatically.
-Step 4: Add high-contrast white centered captions with subtle drop shadow.
+   • 00:18 – 00:26 (Hook: Dawn awakening, 8.0s)
+   • 03:35 – 03:44 (B-Roll: Tram 28 transit, duck audio -6dB, 9.0s)
+   • 06:14 – 06:24 (Insight: The montage confession, 10.0s)
+   • 07:00 – 07:07 (Method: 1 second per thought, 7.0s)
+   • 17:02 – 17:07 (Outro: Pier sunset, hold 0.6s before loop, 4.6s)
+Step 3: Trim all silences > 0.9s (preserve organic cadence).
+Step 4: Use 0.15s cross-dissolve into Tram 28 transit shot.
+Step 5: Add subtle ambient street reverb ducked behind voice track. Rec.709 H.264 export.`,
+    };
+  }
+
+  if (choice === "focus") {
+    return {
+      id: "plan-focus-001",
+      sourceAssetId: "asset-lisbon-raw",
+      targetDurationSeconds: 24,
+      actualDurationSeconds: 24.0,
+      platform: "tiktok",
+      preservedMomentsCount: 3,
+      removedMomentsCount: 20,
+      segments: [
+        {
+          id: "seg-f1",
+          sourceStart: 102,
+          sourceEnd: 111,
+          cutStart: 0,
+          cutEnd: 9.0,
+          title: "Climax Hook: Market Energy Peak",
+          rationale: "Climax-first opening. Starts at emotional zenith (Moment B) to trigger instant curiosity.",
+          audioTreatment: "original",
+        },
+        {
+          id: "seg-f2",
+          sourceStart: 374,
+          sourceEnd: 384,
+          cutStart: 9.0,
+          cutEnd: 19.0,
+          title: "Epiphany: Cutting The Sacred Montage",
+          rationale: "Direct emotional pivot answering the chaotic market energy with intimate clarity.",
+          audioTreatment: "original",
+        },
+        {
+          id: "seg-f3",
+          sourceStart: 1022,
+          sourceEnd: 1027,
+          cutStart: 19.0,
+          cutEnd: 24.0,
+          title: "Outro: Sunset Pier Cooldown",
+          rationale: "Visual anchor holding until 24s mark before looping back to market climax.",
+          audioTreatment: "original",
+        },
+      ],
+      editorialRationale: {
+        strongOpening: "Climax-first restructuring: leads with highest emotional energy rather than chronological sequence.",
+        narrativeThread: "High contrast dynamic between vibrant market movement and intimate confession.",
+        cleanCutsExplanation: "Removed 18 minutes 12 seconds of chronological buildup to maximize emotional payoff first.",
+      },
+      capCutEditPilotPrompt: `Destill EditPilot Handoff — Climax-First 24.0s Focus Cut
+Target Platform: TikTok (9:16 Vertical, 1080x1920)
+Editorial Strategy: FOCUS (Climax-First Hook, Non-Linear Restructuring, High Energy)
+
+Step 1: Import Source "${assetName}" (No re-encoding)
+Step 2: Assemble 3 In/Out Ranges:
+   • 01:42 – 01:51 (Climax Hook: Market energy peak, 9.0s)
+   • 06:14 – 06:24 (Insight: The montage confession, 10.0s)
+   • 17:02 – 17:07 (Outro: Sunset pier resolution, 5.0s)
+Step 3: Trim all silences > 0.6s.
+Step 4: Fast whip-pan cut between Market peak and intimate lens confession.
+Step 5: High-contrast yellow kinetic captions for market climax. Rec.709 H.264 export.`,
+    };
+  }
+
+  // Default: Balanced Strategy (28.4s)
+  return {
+    id: "plan-balanced-001",
+    sourceAssetId: "asset-lisbon-raw",
+    targetDurationSeconds: 28,
+    actualDurationSeconds: 28.4,
+    platform: "tiktok",
+    preservedMomentsCount: 4,
+    removedMomentsCount: 18,
+    segments: [
+      {
+        id: "seg-b1",
+        sourceStart: 18,
+        sourceEnd: 25,
+        cutStart: 0,
+        cutEnd: 7.0,
+        title: "Hook: Feed Retention Trap",
+        rationale: "Immediate hook at unscripted dawn realization; engages viewer in 2s.",
+        audioTreatment: "original",
+      },
+      {
+        id: "seg-b2",
+        sourceStart: 215,
+        sourceEnd: 222,
+        cutStart: 7.0,
+        cutEnd: 14.0,
+        title: "Context: Street Transit B-Roll",
+        rationale: "Establishes Lisbon street context in 7s without lingering on redundant pauses.",
+        audioTreatment: "ducked",
+      },
+      {
+        id: "seg-b3",
+        sourceStart: 374,
+        sourceEnd: 383,
+        cutStart: 14.0,
+        cutEnd: 23.0,
+        title: "Core Thesis: Cutting The Sacred Montage",
+        rationale: "Delivers central takeaway with authoritative vocal delivery.",
+        audioTreatment: "original",
+      },
+      {
+        id: "seg-b4",
+        sourceStart: 1022,
+        sourceEnd: 1027,
+        cutStart: 23.0,
+        cutEnd: 28.4,
+        title: "Outro: Sunset Pier Hold",
+        rationale: "Holds for 5.4s for smooth replay loop back into opening hook.",
+        audioTreatment: "original",
+      },
+    ],
+    editorialRationale: {
+      strongOpening: "Starts on spontaneous realization at 00:18 rather than rehearsed studio intro.",
+      narrativeThread: "Balances narrative clarity, street texture, and actionable advice in 28 seconds.",
+      cleanCutsExplanation: "Removed 18 minutes 08 seconds of camera adjustments, tram compressor dips, and repeated takes.",
+    },
+    capCutEditPilotPrompt: `Destill EditPilot Handoff — Balanced 28.4s Candidate Cut
+Target Platform: TikTok (9:16 Vertical, 1080x1920)
+Editorial Strategy: BALANCED (Narrative Clarity, Rhythmic Pacing, Seamless Replay)
+
+Step 1: Import Source "${assetName}" (No re-encoding)
+Step 2: Assemble 4 In/Out Ranges:
+   • 00:18 – 00:25 (Hook: Direct address, 7.0s)
+   • 03:35 – 03:42 (B-Roll: Street transit, duck audio -6dB, 7.0s)
+   • 06:14 – 06:23 (Insight: The montage confession, 9.0s)
+   • 17:02 – 17:07 (Outro: Pier sunset, hold 0.5s before loop, 5.4s)
+Step 3: Trim all silences > 0.75s automatically.
+Step 4: Clean cut assembly; high-contrast white centered captions with subtle drop shadow.
 Step 5: Export settings: 1080x1920, 30fps, Rec.709 H.264.`,
-};
+  };
+}
+
+/**
+ * Backward-compatible static reference fixture
+ */
+export const SYNTHETIC_EDIT_PLAN: EditPlanSummary = getEditPlanForDecision("balanced");
 
 /**
  * Concrete Demo Implementation of Engine Adapter

@@ -31,6 +31,7 @@ export function Understanding() {
     selectedEvidenceId,
     setSelectedEvidenceId,
     showToast,
+    loadSample,
   } = useApp();
 
   const report = understandingReport ?? SYNTHETIC_UNDERSTANDING_REPORT;
@@ -64,7 +65,7 @@ export function Understanding() {
         right={
           <div className="flex items-center gap-2">
             <Pill tone="mint" dot>
-              {t("engineDemoBadge")}
+              {source?.isSyntheticSample ? t("engineDemoBadge") : "Sandbox Simulation"}
             </Pill>
             <Button
               variant="primary"
@@ -85,12 +86,26 @@ export function Understanding() {
       <div className="sculpt-well-sm mb-5 flex flex-wrap items-center justify-between gap-3 p-3.5 text-[12px] text-[#4d5566]">
         <div className="flex items-center gap-2">
           <IconInfo size={15} className="text-[#3559cb] shrink-0" />
-          <strong className="text-[#151922]">VERIFIED SYNTHETIC REFERENCE SCENARIO: </strong>
-          <span>Lisbon raw footage (18:36). Local neural model execution pending for custom user media.</span>
+          <strong className="text-[#151922]">
+            {source?.isSyntheticSample ? "VERIFIED SYNTHETIC REFERENCE SCENARIO: " : "CLIENT-ONLY DESIGN SANDBOX: "}
+          </strong>
+          <span>
+            {source?.isSyntheticSample
+              ? "Lisbon raw footage (18:36). Local neural model execution pending for custom user media."
+              : `Demonstrating pipeline flow with synthetic analysis baseline for "${source?.name ?? "custom media"}". Local neural inference engine pending in web sandbox.`}
+          </span>
         </div>
         <div className="flex items-center gap-2 font-mono text-[11px]">
-          <span className="sculpt-pill px-2.5 py-0.5 text-[#0e6f64] font-semibold">Model Hypothesis (94%)</span>
-          <span className="sculpt-pill px-2.5 py-0.5 text-[#7d4508] font-semibold">Unknowns Disclosed</span>
+          {source?.isSyntheticSample ? (
+            <>
+              <span className="sculpt-pill px-2.5 py-0.5 text-[#0e6f64] font-semibold">Model Hypothesis (94%)</span>
+              <span className="sculpt-pill px-2.5 py-0.5 text-[#7d4508] font-semibold">Unknowns Disclosed</span>
+            </>
+          ) : (
+            <Button size="sm" variant="secondary" icon={<IconSpark size={12} />} onClick={loadSample}>
+              Load Curated Lisbon Sample
+            </Button>
+          )}
         </div>
       </div>
 

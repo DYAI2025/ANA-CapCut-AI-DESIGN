@@ -20,6 +20,7 @@ import type {
 import {
   SYNTHETIC_EDIT_PLAN,
   SYNTHETIC_UNDERSTANDING_REPORT,
+  getEditPlanForDecision,
 } from "../services/engineAdapter";
 import { fmtBytes, fmtTime } from "../utils/formatters";
 import {
@@ -50,7 +51,7 @@ export type BlockKind =
   | "notready"
   | "consent_missing";
 
-export type DecisionOption = "longer" | "tighter" | "focus" | "retry";
+export type DecisionOption = "balanced" | "longer" | "tighter" | "focus" | "retry";
 
 export type StylePreset = "calm" | "punchy" | "story" | "clean";
 
@@ -89,7 +90,7 @@ export interface AppState {
   procStage: string;
   procProgress: number;
   startAnalysis: () => void;
-  startDestillRun: () => void;
+  startDestillRun: (explicitChoice?: DecisionOption) => void;
   cancelRun: () => void;
 
   // Results
@@ -101,7 +102,7 @@ export interface AppState {
   // Decision
   decisionChoice: DecisionOption;
   setDecisionChoice: (opt: DecisionOption) => void;
-  applyDecision: () => void;
+  applyDecision: (explicitChoice?: DecisionOption) => void;
 
   // Blocked / Error
   blockKind: BlockKind;
@@ -453,41 +454,46 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [source, engineOnline, go, triggerBlock]);
 
   // Future edit plan run
-  const startDestillRun = useCallback(() => {
-    if (!source) {
-      triggerBlock("nofile");
-      return;
-    }
-    if (!engineOnline) {
-      triggerBlock("unavailable");
-      return;
-    }
+  const startDestillRun = useCallback(
+    (explicitChoice?: DecisionOption) => {
+      if (!source) {
+        triggerBlock("nofile");
+        return;
+      }
+      if (!engineOnline) {
+        triggerBlock("unavailable");
+        return;
+      }
 
-    setMode("destill");
-    setProcProgress(0);
-    setProcStage("Prepare");
-    setProcRunning(true);
-    go("processing");
+      const activeChoice = explicitChoice ?? decisionChoice;
+      setMode("destill");
+      setProcProgress(0);
+      setProcStage("Prepare");
+      setProcRunning(true);
+      go("processing");
 
-    if (procIntervalRef.current) window.clearInterval(procIntervalRef.current);
+      if (procIntervalRef.current) window.clearInterval(procIntervalRef.current);
 
-    procIntervalRef.current = window.setInterval(() => {
-      setProcProgress((prev) => {
-        const next = Math.min(100, prev + 3.2);
-        if (next >= 100) {
-          if (procIntervalRef.current) window.clearInterval(procIntervalRef.current);
-          setProcRunning(false);
-          setEditPlan(SYNTHETIC_EDIT_PLAN);
-          setKeptCut(false);
-          window.setTimeout(() => {
-            go("result");
-          }, 450);
-          return 100;
-        }
-        return next;
-      });
-    }, 80);
-  }, [source, engineOnline, go, triggerBlock]);
+      procIntervalRef.current = window.setInterval(() => {
+        setProcProgress((prev) => {
+          const next = Math.min(100, prev + 3.8);
+          if (next >= 100) {
+            if (procIntervalRef.current) window.clearInterval(procIntervalRef.current);
+            setProcRunning(false);
+            const plan = getEditPlanForDecision(activeChoice, source.name);
+            setEditPlan(plan);
+            setKeptCut(false);
+            window.setTimeout(() => {
+              go("result");
+            }, 350);
+            return 100;
+          }
+          return next;
+        });
+      }, 70);
+    },
+    [source, engineOnline, decisionChoice, go, triggerBlock]
+  );
 
   const cancelRun = useCallback(() => {
     if (procIntervalRef.current) window.clearInterval(procIntervalRef.current);
@@ -497,14 +503,25 @@ export function AppProvider({ children }: { children: ReactNode }) {
     go("home");
   }, [go, lang, showToast]);
 
-  const applyDecision = useCallback(() => {
-    let newLen = targetDuration;
-    if (decisionChoice === "longer") newLen = Math.min(120, targetDuration + 15);
-    else if (decisionChoice === "tighter") newLen = Math.max(30, targetDuration - 15);
-    setTargetDuration(newLen);
-    showToast(`Adjusted target to ${fmtTime(newLen)}`);
-    startDestillRun();
-  }, [decisionChoice, targetDuration, showToast, startDestillRun]);
+  const applyDecision = useCallback(
+    (explicitChoice?: DecisionOption) => {
+      const activeChoice = explicitChoice ?? decisionChoice;
+      setDecisionChoice(activeChoice);
+
+      let newLen = targetDuration;
+      if (activeChoice === "longer") newLen = 39;
+      else if (activeChoice === "tighter") newLen = 18;
+      else if (activeChoice === "focus") newLen = 24;
+      else newLen = 28;
+
+      setTargetDuration(newLen);
+      const plan = getEditPlanForDecision(activeChoice, source?.name);
+      setEditPlan(plan);
+      showToast(`Selected ${activeChoice.toUpperCase()} strategy (${plan.actualDurationSeconds}s)`);
+      startDestillRun(activeChoice);
+    },
+    [decisionChoice, targetDuration, source, showToast, startDestillRun]
+  );
 
   const value: AppState = {
     lang,

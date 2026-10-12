@@ -45,14 +45,15 @@ export function Decision() {
 
   const calculatedDuration =
     localSelection === "longer"
-      ? Math.min(120, targetDuration + 15)
+      ? 39
       : localSelection === "tighter"
-      ? Math.max(30, targetDuration - 15)
-      : targetDuration;
+      ? 18
+      : localSelection === "focus"
+      ? 24
+      : 28;
 
   const handleConfirm = () => {
-    setDecisionChoice(localSelection);
-    applyDecision();
+    applyDecision(localSelection);
   };
 
   const moments: { tag: "A" | "B"; kind: SceneKind; label: string; time: string; quote: string }[] = [
@@ -233,7 +234,7 @@ export function Decision() {
         {/* Secondary Duration Segmented Control (sculpt-seg-track & sculpt-seg-thumb) */}
         <div className="w-full max-w-[480px]">
           <Segmented<"tighter" | "focus" | "longer">
-            value={localSelection === "retry" ? "focus" : localSelection}
+            value={localSelection === "longer" ? "longer" : localSelection === "tighter" ? "tighter" : "focus"}
             onChange={(val) => setLocalSelection(val)}
             options={[
               { value: "tighter", label: "Tighter (-15s)", icon: <IconMinus size={13} /> },

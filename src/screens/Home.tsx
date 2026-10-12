@@ -97,17 +97,28 @@ export function Home() {
                   sceneKind="dawn"
                   ratio="16/9"
                   badge={
-                    <Pill tone="mint" dot>
-                      {t("sourceReadyBadge")}
-                    </Pill>
+                    source.isSyntheticSample ? (
+                      <Pill tone="mint" dot>
+                        Curated Reference (18:36)
+                      </Pill>
+                    ) : (
+                      <Pill tone="amber" dot>
+                        Uploaded File
+                      </Pill>
+                    )
                   }
                 />
               </div>
 
-              {/* Real probed metadata strip */}
+              {/* Real probed metadata strip with source provenance */}
               <div className="flex flex-col gap-2 px-1">
-                <div className="truncate text-[17px] font-bold tracking-tight text-[#151922]">
-                  {source.name}
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="truncate text-[17px] font-bold tracking-tight text-[#151922]">
+                    {source.name}
+                  </div>
+                  <span className="font-mono text-[11px] font-semibold px-2 py-0.5 rounded-full bg-black/5 text-[#4d5566]">
+                    {source.isSyntheticSample ? "CURATED SCENARIO" : "CUSTOM MEDIA"}
+                  </span>
                 </div>
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[12.5px] text-[#606d81]">
                   <span>
@@ -145,15 +156,24 @@ export function Home() {
 
               {/* Hardware Acceleration Note */}
               <div className="rounded-[14px] bg-white/70 px-4 py-2.5 text-[12px] leading-relaxed text-[#606d81] border border-white/80">
-                <strong className="text-[#151922]">Hardware Decoded: </strong>
-                {t("hevcNotice")}
+                <strong className="text-[#151922]">
+                  {source.isSyntheticSample ? "Deterministic Pipeline: " : "Client-Side Sandbox: "}
+                </strong>
+                {source.isSyntheticSample
+                  ? t("hevcNotice")
+                  : `Probed metadata for "${source.name}". Pipeline flow and synthetic analysis enabled for interactive testing.`}
               </div>
 
               {/* Controls inside well */}
-              <div className="flex items-center gap-3 pt-1">
+              <div className="flex flex-wrap items-center gap-3 pt-1">
                 <Button size="sm" icon={<IconRefresh size={13} />} onClick={openPicker}>
                   {t("replaceSource")}
                 </Button>
+                {!source.isSyntheticSample && (
+                  <Button size="sm" variant="secondary" icon={<IconSpark size={13} />} onClick={loadSample}>
+                    Load Curated Sample
+                  </Button>
+                )}
                 <Button
                   size="sm"
                   variant="ghost"
@@ -335,7 +355,7 @@ export function Home() {
               variant="primary"
               size="xl"
               icon={<IconDrop size={20} />}
-              onClick={startDestillRun}
+              onClick={() => startDestillRun()}
               className="w-full sm:min-w-[280px]"
             >
               {t("ctaDestill")}
